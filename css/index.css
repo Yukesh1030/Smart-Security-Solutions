@@ -824,3 +824,36 @@ header.nav-open .mobile-menu-toggle .bar:nth-child(3) {
   color: var(--text-primary-dark);
   background: rgba(0, 122, 255, 0.02);
 }
+
+/* Mobile Typography & Layout Fixes */
+@media (max-width: 768px) {
+  h1 { font-size: clamp(2rem, 8vw, 3rem); }
+  h2 { font-size: clamp(1.75rem, 6vw, 2.5rem); }
+  h3 { font-size: 1.5rem; }
+  p { font-size: 1rem; }
+  
+  .hero-content { padding: 0 1rem; }
+  
+  .stats-grid { 
+    grid-template-columns: 1fr;
+    gap: 2.5rem; 
+  }
+  .stat-item h2.counter-val { 
+    font-size: clamp(2.5rem, 12vw, 3.5rem); 
+    word-break: break-word; 
+  }
+  
+  .glass-panel { 
+    padding: 2rem 1.5rem; 
+    margin: 1rem; 
+  }
+  
+  section { padding: 4rem 0; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 2.2rem; }
+  h2 { font-size: 1.8rem; }
+  .stat-item h2.counter-val { font-size: 2.5rem; }
+  .premium-card { padding: 1.5rem; }
+}
