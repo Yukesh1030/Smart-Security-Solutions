@@ -10,156 +10,150 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Navbar transition logic removed per request.
 
-  // GSAP ScrollTrigger Animations with Mobile Responsiveness
-  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    gsap.registerPlugin(ScrollTrigger);
+  // Intersection Observer for Scroll Animations
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.15
+  };
 
-    const mm = gsap.matchMedia();
-
-    // Desktop Animations (min-width: 768px)
-    mm.add("(min-width: 768px)", () => {
-      // Non-staggered fade up elements
-      gsap.utils.toArray('.animate-fade-up:not(.stagger-child)').forEach(el => {
-        gsap.fromTo(el, 
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 85%",
-              toggleActions: "play none none none"
-            }
-          }
-        );
-      });
-
-      // Staggered parent animations
-      gsap.utils.toArray('.stagger-parent').forEach(parent => {
-        const children = parent.querySelectorAll('.stagger-child');
-        if (children.length > 0) {
-          gsap.fromTo(children,
-            { opacity: 0, y: 30 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.8,
-              stagger: 0.15,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: parent,
-                start: "top 85%",
-                toggleActions: "play none none none"
-              }
-            }
-          );
+  const animationObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        
+        if (el.classList.contains('stagger-parent')) {
+          const children = el.querySelectorAll('.stagger-child');
+          children.forEach((child, index) => {
+            setTimeout(() => {
+              child.style.opacity = '1';
+              child.style.transform = 'translateY(0)';
+              child.style.transition = 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+            }, index * 100);
+          });
+        } else {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+          el.style.transition = 'opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1)';
         }
-      });
-    });
 
-    // Mobile Animations (max-width: 767px)
-    mm.add("(max-width: 767px)", () => {
-      // Non-staggered fade up elements
-      gsap.utils.toArray('.animate-fade-up:not(.stagger-child)').forEach(el => {
-        gsap.fromTo(el, 
-          { opacity: 0, y: 15 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: el,
-              start: "top 90%",
-              toggleActions: "play none none none"
+        // Counter values animations
+        const counters = el.querySelectorAll('.counter-val');
+        counters.forEach(counter => {
+          const target = +counter.getAttribute('data-target');
+          let count = 0;
+          const duration = 2000; // 2 seconds
+          const interval = 16; // 60 fps
+          const step = (target / (duration / interval));
+          
+          const updateCount = () => {
+            count += step;
+            if (count < target) {
+              counter.innerText = Math.ceil(count).toLocaleString();
+              setTimeout(updateCount, interval);
+            } else {
+              counter.innerText = target.toLocaleString();
             }
-          }
-        );
-      });
+          };
+          updateCount();
+        });
 
-      // Staggered parent animations
-      gsap.utils.toArray('.stagger-parent').forEach(parent => {
-        const children = parent.querySelectorAll('.stagger-child');
-        if (children.length > 0) {
-          gsap.fromTo(children,
-            { opacity: 0, y: 15 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              stagger: 0.1,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: parent,
-                start: "top 90%",
-                toggleActions: "play none none none"
-              }
-            }
-          );
-        }
-      });
+        observer.unobserve(el);
+      }
     });
+  }, observerOptions);
 
-    // Counter animation with ScrollTrigger
-    gsap.utils.toArray('.counter-val').forEach(counter => {
-      const target = +counter.getAttribute('data-target');
-      const obj = { val: 0 };
-      gsap.to(obj, {
-        val: target,
-        duration: 2,
-        ease: "power1.out",
-        scrollTrigger: {
-          trigger: counter,
-          start: "top 90%",
-          toggleActions: "play none none none"
-        },
-        onUpdate: () => {
-          counter.innerText = Math.ceil(obj.val).toLocaleString();
-        }
+  // Initialize animated elements styles
+  document.querySelectorAll('.animate-fade-up, .stagger-parent').forEach(el => {
+    if (!el.classList.contains('stagger-parent')) {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(35px)';
+      el.style.willChange = 'opacity, transform';
+    } else {
+      el.querySelectorAll('.stagger-child').forEach(child => {
+        child.style.opacity = '0';
+        child.style.transform = 'translateY(25px)';
+        child.style.willChange = 'opacity, transform';
       });
-    });
-  } else {
-    // Fallback: If GSAP or ScrollTrigger failed to load, ensure all content is visible
-    document.querySelectorAll('.animate-fade-up, .stagger-child').forEach(el => {
-      el.style.opacity = '1';
-    });
-  }
+    }
+    animationObserver.observe(el);
+  });
 
   // Form Validation Utility
   const forms = document.querySelectorAll('form[data-validate]');
   forms.forEach(form => {
     form.addEventListener('submit', (e) => {
-      e.preventDefault();
       let isValid = true;
       const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
 
       inputs.forEach(input => {
-        const errorMsg = input.nextElementSibling;
-        if (!input.value.trim()) {
+        // Find or create error message container
+        let errorMsg = input.parentNode.querySelector('.error-message');
+        if (!errorMsg) {
+          errorMsg = document.createElement('div');
+          errorMsg.className = 'error-message';
+          errorMsg.style.color = '#007AFF'; // mapped accent color
+          errorMsg.style.fontSize = '0.8rem';
+          errorMsg.style.marginTop = '0.4rem';
+          errorMsg.style.display = 'none';
+          input.parentNode.appendChild(errorMsg);
+        }
+
+        const value = input.value.trim();
+        let inputError = false;
+        let errorText = '';
+
+        if (!value) {
+          inputError = true;
+          errorText = 'This field is required.';
+        } else if (input.type === 'email') {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            inputError = true;
+            errorText = 'Please enter a valid email address.';
+          }
+        }
+
+        if (inputError) {
           isValid = false;
-          input.style.borderColor = 'red';
-          if (errorMsg && errorMsg.classList.contains('error-message')) {
-            errorMsg.style.display = 'block';
-          }
+          input.style.borderColor = '#007AFF'; // accent color
+          errorMsg.innerText = errorText;
+          errorMsg.style.display = 'block';
         } else {
-          input.style.borderColor = 'rgba(0,0,0,0.1)';
-          if (errorMsg && errorMsg.classList.contains('error-message')) {
-            errorMsg.style.display = 'none';
-          }
+          input.style.borderColor = 'rgba(0, 122, 255, 0.15)';
+          errorMsg.style.display = 'none';
         }
       });
 
-      if (isValid) {
-        if (form.id === 'loginForm') {
-          alert('Action successful! (Static UI Demo)');
+      if (!isValid) {
+        e.preventDefault();
+      } else {
+        // If valid and it's a redirect / submit behavior
+        if (form.getAttribute('action') === null || form.getAttribute('action') === '') {
+          e.preventDefault();
+          alert('Submitting form successfully!');
           form.reset();
-        } else {
-          window.location.href = '404.html';
         }
       }
     });
+  });
+
+  // Interactive FAQ Accordion Listener
+  document.addEventListener('click', (e) => {
+    const faqQuestion = e.target.closest('.faq-question');
+    if (faqQuestion) {
+      const item = faqQuestion.parentElement;
+      const isActive = item.classList.contains('active');
+      
+      // Close other active FAQ items
+      document.querySelectorAll('.faq-item').forEach(faqItem => {
+        faqItem.classList.remove('active');
+      });
+
+      if (!isActive) {
+        item.classList.add('active');
+      }
+    }
   });
 
   // Jello Stretchy Variable Font Animation
@@ -167,28 +161,28 @@ document.addEventListener('DOMContentLoaded', () => {
   if (heroTitle && typeof gsap !== 'undefined') {
     // A robust function to wrap characters in inline-block spans
     const splitText = (el, spanClass) => {
-      const text = el.innerHTML.trim();
+      const htmlParts = el.innerHTML.trim().split(/(<[^>]+>)/g);
       let result = '';
-      let inTag = false;
       
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        if (char === '<') {
-          inTag = true;
-          result += char;
-        } else if (char === '>') {
-          inTag = false;
-          result += char;
-        } else if (inTag) {
-          result += char;
+      htmlParts.forEach(part => {
+        if (part.startsWith('<')) {
+          result += part;
         } else {
-          if (char === ' ' || char === '\n' || char === '\r') {
-            result += ' ';
-          } else {
-            result += `<span class="${spanClass}" style="display: inline-block; transform-origin: bottom center; will-change: font-variation-settings, transform; font-variation-settings: 'wght' 400;">${char}</span>`;
-          }
+          const words = part.split(/(\s+)/);
+          words.forEach(word => {
+            if (/\s+/.test(word) || !word) {
+              result += word;
+            } else {
+              result += `<span style="display: inline-block; white-space: nowrap;">`;
+              for (let i = 0; i < word.length; i++) {
+                const char = word[i];
+                result += `<span class="${spanClass}" style="display: inline-block; transform-origin: bottom center; will-change: transform; font-variation-settings: 'wght' 400;">${char}</span>`;
+              }
+              result += `</span>`;
+            }
+          });
         }
-      }
+      });
       el.innerHTML = result;
     };
 

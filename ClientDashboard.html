@@ -991,20 +991,20 @@
 
         <!-- Section 1: Settings Form -->
         <div class="form-card animate-fade-up" style="margin-bottom: 2rem;">
-          <form onsubmit="event.preventDefault(); alert('Profile preferences updated!');">
+          <form id="profileSettingsForm" data-validate="true" novalidate>
             <div class="form-group">
               <label class="form-label">Full Name</label>
-              <input type="text" class="form-control" value="John Doe">
+              <input type="text" class="form-control" value="John Doe" required>
             </div>
 
             <div class="form-group">
               <label class="form-label">Email Address</label>
-              <input type="email" class="form-control" value="john@stackly.com">
+              <input type="email" class="form-control" value="john@stackly.com" required>
             </div>
 
             <div class="form-group">
               <label class="form-label">Master PIN</label>
-              <input type="password" class="form-control" value="123456" placeholder="Enter secure PIN">
+              <input type="password" class="form-control" value="123456" placeholder="Enter secure PIN" required>
             </div>
 
             <button type="submit" class="btn-save">Save Settings</button>
@@ -1015,11 +1015,17 @@
         <div class="data-card animate-fade-up">
           <h2>Shared Accounts Access</h2>
           <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 1.5rem;">Grant local device lock and monitor control access to family member emails.</p>
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 1rem; border-radius: 8px;">
-              <span>family@stackly.com (Viewer)</span>
-              <button class="btn-outline-sm" style="color: #ff3b30; border-color: rgba(255,59,48,0.2);" onclick="alert('Access revoked')">Revoke</button>
+          <form id="addShareEmailForm" data-validate="true" style="margin-bottom: 2rem;" novalidate>
+            <div class="form-group" style="display: flex; gap: 1rem; align-items: flex-end; margin-bottom: 0;">
+              <div style="flex: 1;">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="shareEmailInput" class="form-control" placeholder="member@family.com" required>
+              </div>
+              <button type="submit" class="btn-save" style="padding: 0.85rem 1.5rem;">Add Access</button>
             </div>
+          </form>
+          <div id="sharedEmailsList" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Rendered dynamically -->
           </div>
         </div>
 
@@ -1227,7 +1233,55 @@
         nameDisplay.innerText = cleanUsername;
         avatarDisplay.innerText = cleanUsername.charAt(0).toUpperCase();
       }
+
+      // Dynamic Shared Emails list state and rendering
+      const sharedEmailsList = document.getElementById('sharedEmailsList');
+      const addShareForm = document.getElementById('addShareEmailForm');
+      const shareEmailInput = document.getElementById('shareEmailInput');
+
+      let sharedEmails = JSON.parse(localStorage.getItem('sharedEmails')) || ['family@stackly.com'];
+
+      function renderSharedEmails() {
+        if (!sharedEmailsList) return;
+        sharedEmailsList.innerHTML = '';
+        if (sharedEmails.length === 0) {
+          sharedEmailsList.innerHTML = '<p style="font-size: 0.85rem; color: #a0aec0;">No shared accounts added yet.</p>';
+          return;
+        }
+        sharedEmails.forEach((email, index) => {
+          const item = document.createElement('div');
+          item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);';
+          item.innerHTML = `
+            <span>${email} (Viewer)</span>
+            <button class="btn-outline-sm" style="color: var(--color-electric-blue); border-color: rgba(0, 122, 255, 0.2);" onclick="revokeAccess(${index})">Revoke</button>
+          `;
+          sharedEmailsList.appendChild(item);
+        });
+      }
+
+      window.revokeAccess = function(index) {
+        sharedEmails.splice(index, 1);
+        localStorage.setItem('sharedEmails', JSON.stringify(sharedEmails));
+        renderSharedEmails();
+      };
+
+      if (addShareForm) {
+        addShareForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const emailVal = shareEmailInput.value.trim();
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailVal && emailRegex.test(emailVal)) {
+            sharedEmails.push(emailVal);
+            localStorage.setItem('sharedEmails', JSON.stringify(sharedEmails));
+            shareEmailInput.value = '';
+            renderSharedEmails();
+          }
+        });
+      }
+
+      renderSharedEmails();
     });
   </script>
+  <script src="js/main.js"></script>
 </body>
 </html>

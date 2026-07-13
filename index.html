@@ -11,7 +11,7 @@
 <body>
   
   <!-- Header / Navbar -->
-  <header>
+  <header class="dark-theme">
     <div class="nav-container">
       <div class="logo">
         <a href="index.html">
@@ -45,13 +45,13 @@
         <div class="hero-overlay"></div>
       </div>
       <div class="hero-content stagger-parent">
-        <h1 style="color: var(--color-black);">The Future of <br>Smart Security</h1>
-        <p style="font-size: 1.25rem; margin: 2rem auto; color: var(--color-black);">
+        <h1 style="color: var(--color-white);">The Future of <br>Smart Security</h1>
+        <p style="font-size: 1.25rem; margin: 2rem auto; color: var(--color-white);">
           Elegant design meets enterprise-grade protection. Secure, automate, and control your home with a single, intelligent ecosystem.
         </p>
         <div class="animate-fade-up stagger-child" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="404.html" class="btn btn-primary" style="color: var(--color-black);">Shop Systems <i class="fas fa-arrow-right"></i></a>
-          <a href="404.html" class="btn btn-outline" style="color: var(--color-black); border-color: rgba(0,0,0,0.3);">Discover <i class="fas fa-chevron-down"></i></a>
+          <a href="404.html" class="btn btn-primary" style="color: var(--color-white);">Shop Systems <i class="fas fa-arrow-right"></i></a>
+          <a href="404.html" class="btn btn-outline" style="color: var(--color-white); border-color: rgba(255,255,255,0.4);">Discover <i class="fas fa-chevron-down"></i></a>
         </div>
       </div>
       <!-- Wave Divider to next section -->
@@ -199,6 +199,87 @@
       </div>
     </section>
 
+    <!-- FAQ Section (Section 8) -->
+    <section class="bg-gray">
+      <div class="container animate-fade-up">
+        <div class="section-title">
+          <h2 style="color: var(--color-black);">Frequently Asked Questions</h2>
+          <p>Everything you need to know about the premium Stackly ecosystem.</p>
+        </div>
+        <div class="faq-accordion">
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>How does the 24/7 professional monitoring work?</span>
+              <span class="faq-icon"><i class="fas fa-plus"></i></span>
+            </div>
+            <div class="faq-answer">
+              <p>When an alarm is triggered, our professional monitoring center receives an alert immediately. A certified dispatcher will verify the emergency via video feed or voice hub call and dispatch local emergency services in seconds.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>Can I install the equipment myself?</span>
+              <span class="faq-icon"><i class="fas fa-plus"></i></span>
+            </div>
+            <div class="faq-answer">
+              <p>While our equipment is designed to look clean, we enforce certified professional installation to optimize camera viewing angles, secure sensors, and guarantee reliable network connectivity.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>Is there a lifetime warranty on devices?</span>
+              <span class="faq-icon"><i class="fas fa-plus"></i></span>
+            </div>
+            <div class="faq-answer">
+              <p>Yes. All hardware devices are covered by a full lifetime warranty as long as you maintain an active 24/7 professional monitoring subscription plan.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Specifications Matrix (Section 9) -->
+    <section style="background: var(--color-white);">
+      <div class="container animate-fade-up">
+        <div class="section-title">
+          <h2 style="color: var(--color-black);">Hardware Specifications</h2>
+          <p>Meticulously engineered metrics of our security nodes.</p>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="specs-matrix">
+            <thead>
+              <tr>
+                <th>Hardware Node</th>
+                <th>Resolution / Range</th>
+                <th>Battery Life</th>
+                <th>Connectivity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Outdoor Camera Pro</td>
+                <td>4K Ultra HD, 140° Field of View</td>
+                <td>AC Powered / Battery Backup</td>
+                <td>Dual-Band Wi-Fi (2.4/5 GHz)</td>
+              </tr>
+              <tr>
+                <td>Smart Hub Touch Panel</td>
+                <td>7-inch IPS Capacitive Screen</td>
+                <td>24-Hour Rechargeable Backup</td>
+                <td>Cellular LTE & Wi-Fi</td>
+              </tr>
+              <tr>
+                <td>Keyless Smart Lock</td>
+                <td>Bluetooth Proximity, Pin Keypad</td>
+                <td>Up to 12 Months (AA Batteries)</td>
+                <td>Zigbee Mesh Grid</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA Banner -->
     <section class="bg-dark" style="text-align: center; padding: 10rem 2rem; position: relative;">
       <div class="gradient-overlay"></div>
@@ -243,14 +324,14 @@
         <div class="footer-links">
           <h4>Stay Updated</h4>
           <p style="font-size: 0.9rem; margin-bottom: 1rem;">Subscribe to our newsletter for the latest smart home trends.</p>
-          <form data-validate="true" style="display: flex; gap: 0.5rem;" novalidate>
+          <form action="404.html" method="GET" style="display: flex; gap: 0.5rem;">
             <input type="email" placeholder="Email Address" class="form-control" required style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 0.5rem 1rem;">
             <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem;"><i class="fas fa-arrow-right"></i></button>
           </form>
         </div>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; 2026 Stackly Inc. All rights reserved. | <a href="404.html" style="text-decoration: underline;">Privacy Policy</a> | <a href="404.html" style="text-decoration: underline;">Terms of Service</a></p>
+      <div class="footer-bottom" style="text-align: center; color: #ffffff;">
+        <p style="color: #ffffff; text-align: center; margin: 0;">&copy; 2026 Stackly Inc. All rights reserved. | <a href="404.html" style="color: #ffffff; text-decoration: underline;">Privacy Policy</a> | <a href="404.html" style="color: #ffffff; text-decoration: underline;">Terms of Service</a></p>
       </div>
     </div>
   </footer>

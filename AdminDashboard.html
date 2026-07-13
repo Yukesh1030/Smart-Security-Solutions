@@ -548,40 +548,8 @@
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td data-label="Device Name">Front Gate CCTV</td>
-                  <td data-label="Type">Camera</td>
-                  <td data-label="Status"><span class="badge badge-success">Online</span></td>
-                  <td data-label="Battery">100% (AC)</td>
-                  <td data-label="Connection">94 ms</td>
-                  <td data-label="Actions">
-                    <button class="btn-sm btn-outline-sm">Edit</button>
-                    <button class="btn-sm btn-danger-sm">Remove</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Device Name">Front Door Lock</td>
-                  <td data-label="Type">Smart Lock</td>
-                  <td data-label="Status"><span class="badge badge-success">Online</span></td>
-                  <td data-label="Battery">85%</td>
-                  <td data-label="Connection">12 ms</td>
-                  <td data-label="Actions">
-                    <button class="btn-sm btn-outline-sm">Edit</button>
-                    <button class="btn-sm btn-danger-sm">Remove</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="Device Name">Kitchen Smoke Detector</td>
-                  <td data-label="Type">Sensor</td>
-                  <td data-label="Status"><span class="badge badge-success">Online</span></td>
-                  <td data-label="Battery">92%</td>
-                  <td data-label="Connection">45 ms</td>
-                  <td data-label="Actions">
-                    <button class="btn-sm btn-outline-sm">Edit</button>
-                    <button class="btn-sm btn-danger-sm">Remove</button>
-                  </td>
-                </tr>
+              <tbody id="deviceTableBody">
+                <!-- Rendered dynamically -->
               </tbody>
             </table>
           </div>
@@ -591,28 +559,28 @@
         <div class="data-card animate-fade-up">
           <h2>Register New Device</h2>
           <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 1.5rem;">Connect a new hardware sensor or camera module to the local router grid.</p>
-          <form onsubmit="event.preventDefault(); alert('Device pairing requested!');">
+          <form id="registerDeviceForm" data-validate="true" novalidate>
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label">Device Name</label>
-                <input type="text" class="form-control" placeholder="e.g. Patio Sensor" required>
+                <input type="text" id="devNameInput" class="form-control" placeholder="e.g. Patio Sensor" required>
               </div>
               <div class="form-group">
                 <label class="form-label">Device Type</label>
-                <select class="form-control">
-                  <option>Camera Feed</option>
-                  <option>Smart Lock</option>
-                  <option>Motion Sensor</option>
-                  <option>Alarm Siren</option>
+                <select id="devTypeSelect" class="form-control" required>
+                  <option value="Camera">Camera Feed</option>
+                  <option value="Smart Lock">Smart Lock</option>
+                  <option value="Sensor">Motion Sensor</option>
+                  <option value="Siren">Alarm Siren</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label">IP Address</label>
-                <input type="text" class="form-control" placeholder="192.168.1.100" required>
+                <input type="text" id="devIpInput" class="form-control" placeholder="192.168.1.100" required>
               </div>
               <div class="form-group">
                 <label class="form-label">Pairing Pin</label>
-                <input type="password" class="form-control" placeholder="••••" required>
+                <input type="password" id="devPinInput" class="form-control" placeholder="••••" required>
               </div>
             </div>
             <button type="submit" class="btn-sm btn-primary-sm" style="padding: 0.75rem 2rem;">Register & Pair Device</button>
@@ -705,29 +673,8 @@
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td data-label="User Profile">John Doe (john@stackly.com)</td>
-                  <td data-label="Role">Client</td>
-                  <td data-label="Permission Level">Regular Account</td>
-                  <td data-label="Status"><span class="badge badge-success">Active</span></td>
-                  <td data-label="Registered">2026-02-14</td>
-                  <td data-label="Actions">
-                    <button class="btn-sm btn-outline-sm">Modify</button>
-                    <button class="btn-sm btn-danger-sm">Suspend</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td data-label="User Profile">Dev Tech (dev@stackly.com)</td>
-                  <td data-label="Role">Admin</td>
-                  <td data-label="Permission Level">Root Admin</td>
-                  <td data-label="Status"><span class="badge badge-success">Active</span></td>
-                  <td data-label="Registered">2026-01-01</td>
-                  <td data-label="Actions">
-                    <button class="btn-sm btn-outline-sm">Modify</button>
-                    <button class="btn-sm btn-danger-sm">Suspend</button>
-                  </td>
-                </tr>
+              <tbody id="userTableBody">
+                <!-- Rendered dynamically -->
               </tbody>
             </table>
           </div>
@@ -736,26 +683,26 @@
         <!-- Section 2: Add New User Form -->
         <div class="data-card animate-fade-up">
           <h2>Create User Profile</h2>
-          <form onsubmit="event.preventDefault(); alert('User account registered!');">
+          <form id="createUserForm" data-validate="true" novalidate>
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label">Full Name</label>
-                <input type="text" class="form-control" placeholder="e.g. Sarah Connor" required>
+                <input type="text" id="usrNameInput" class="form-control" placeholder="e.g. Sarah Connor" required>
               </div>
               <div class="form-group">
                 <label class="form-label">Email Address</label>
-                <input type="email" class="form-control" placeholder="sarah@skynet.com" required>
+                <input type="email" id="usrEmailInput" class="form-control" placeholder="sarah@skynet.com" required>
               </div>
               <div class="form-group">
                 <label class="form-label">Assigned Role</label>
-                <select class="form-control">
-                  <option>Client</option>
-                  <option>Admin</option>
+                <select id="usrRoleSelect" class="form-control" required>
+                  <option value="Client">Client</option>
+                  <option value="Admin">Admin</option>
                 </select>
               </div>
               <div class="form-group">
                 <label class="form-label">Keypad PIN</label>
-                <input type="password" class="form-control" placeholder="e.g. 1234" required>
+                <input type="password" id="usrPinInput" class="form-control" placeholder="e.g. 1234" required>
               </div>
             </div>
             <button type="submit" class="btn-sm btn-primary-sm" style="padding: 0.75rem 2rem;">Register Account</button>
@@ -1071,21 +1018,21 @@
         <!-- Section 2: Export Data Tool -->
         <div class="data-card animate-fade-up">
           <h2>Export Logs Panel</h2>
-          <form onsubmit="event.preventDefault(); alert('Report generation started!');">
+          <form id="exportLogsForm" data-validate="true" novalidate>
             <div class="form-grid">
               <div class="form-group">
                 <label class="form-label">Start Date</label>
-                <input type="date" class="form-control" value="2026-07-01">
+                <input type="date" class="form-control" value="2026-07-01" required>
               </div>
               <div class="form-group">
                 <label class="form-label">End Date</label>
-                <input type="date" class="form-control" value="2026-07-13">
+                <input type="date" class="form-control" value="2026-07-13" required>
               </div>
               <div class="form-group">
                 <label class="form-label">File Type</label>
-                <select class="form-control">
-                  <option>Portable Document (PDF)</option>
-                  <option>Comma Separated Values (CSV)</option>
+                <select class="form-control" required>
+                  <option value="PDF">Portable Document (PDF)</option>
+                  <option value="CSV">Comma Separated Values (CSV)</option>
                 </select>
               </div>
             </div>
@@ -1361,7 +1308,155 @@
         nameDisplay.innerText = cleanUsername;
         avatarDisplay.innerText = cleanUsername.charAt(0).toUpperCase();
       }
+
+      // Dynamic paired hardware state & rendering
+      const deviceTableBody = document.getElementById('deviceTableBody');
+      const registerDeviceForm = document.getElementById('registerDeviceForm');
+      const devNameInput = document.getElementById('devNameInput');
+      const devTypeSelect = document.getElementById('devTypeSelect');
+      const devIpInput = document.getElementById('devIpInput');
+
+      let devicesList = JSON.parse(localStorage.getItem('devicesList')) || [
+        { name: 'Front Gate CCTV', type: 'Camera', status: 'Online', battery: '100% (AC)', ping: '94 ms' },
+        { name: 'Front Door Lock', type: 'Smart Lock', status: 'Online', battery: '85%', ping: '12 ms' },
+        { name: 'Kitchen Smoke Detector', type: 'Sensor', status: 'Online', battery: '92%', ping: '45 ms' }
+      ];
+
+      function renderDevices() {
+        if (!deviceTableBody) return;
+        deviceTableBody.innerHTML = '';
+        devicesList.forEach((dev, idx) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td data-label="Device Name">${dev.name}</td>
+            <td data-label="Type">${dev.type}</td>
+            <td data-label="Status"><span class="badge badge-success" style="background: rgba(0,122,255,0.08); color: var(--color-electric-blue); border: 1px solid rgba(0,122,255,0.15);">${dev.status}</span></td>
+            <td data-label="Battery">${dev.battery}</td>
+            <td data-label="Connection">${dev.ping}</td>
+            <td data-label="Actions">
+              <button class="btn-sm btn-outline-sm" onclick="editDevice(${idx})">Edit</button>
+              <button class="btn-sm btn-danger-sm" onclick="removeDevice(${idx})">Remove</button>
+            </td>
+          `;
+          deviceTableBody.appendChild(row);
+        });
+      }
+
+      window.removeDevice = function(idx) {
+        devicesList.splice(idx, 1);
+        localStorage.setItem('devicesList', JSON.stringify(devicesList));
+        renderDevices();
+      };
+
+      window.editDevice = function(idx) {
+        const newName = prompt('Enter new name:', devicesList[idx].name);
+        if (newName) {
+          devicesList[idx].name = newName;
+          localStorage.setItem('devicesList', JSON.stringify(devicesList));
+          renderDevices();
+        }
+      };
+
+      if (registerDeviceForm) {
+        registerDeviceForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = devNameInput.value.trim();
+          const type = devTypeSelect.value;
+          const ip = devIpInput.value.trim();
+          if (name && type && ip) {
+            devicesList.push({
+              name: name,
+              type: type,
+              status: 'Online',
+              battery: '100%',
+              ping: '5 ms'
+            });
+            localStorage.setItem('devicesList', JSON.stringify(devicesList));
+            devNameInput.value = '';
+            devIpInput.value = '';
+            document.getElementById('devPinInput').value = '';
+            renderDevices();
+          }
+        });
+      }
+
+      renderDevices();
+
+      // Dynamic User Management state & rendering
+      const userTableBody = document.getElementById('userTableBody');
+      const createUserForm = document.getElementById('createUserForm');
+      const usrNameInput = document.getElementById('usrNameInput');
+      const usrEmailInput = document.getElementById('usrEmailInput');
+      const usrRoleSelect = document.getElementById('usrRoleSelect');
+
+      let usersList = JSON.parse(localStorage.getItem('usersList')) || [
+        { name: 'John Doe', email: 'john@stackly.com', role: 'Client', perm: 'Regular Account', status: 'Active', date: '2026-02-14' },
+        { name: 'Dev Tech', email: 'dev@stackly.com', role: 'Admin', perm: 'Root Admin', status: 'Active', date: '2026-01-01' }
+      ];
+
+      function renderUsers() {
+        if (!userTableBody) return;
+        userTableBody.innerHTML = '';
+        usersList.forEach((usr, idx) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td data-label="User Profile">${usr.name} (${usr.email})</td>
+            <td data-label="Role">${usr.role}</td>
+            <td data-label="Permission Level">${usr.perm}</td>
+            <td data-label="Status"><span class="badge badge-success" style="background: rgba(0,122,255,0.08); color: var(--color-electric-blue); border: 1px solid rgba(0,122,255,0.15);">${usr.status}</span></td>
+            <td data-label="Registered">${usr.date}</td>
+            <td data-label="Actions">
+              <button class="btn-sm btn-outline-sm" onclick="modifyUser(${idx})">Modify</button>
+              <button class="btn-sm btn-danger-sm" onclick="suspendUser(${idx})">Suspend</button>
+            </td>
+          `;
+          userTableBody.appendChild(row);
+        });
+      }
+
+      window.suspendUser = function(idx) {
+        usersList.splice(idx, 1);
+        localStorage.setItem('usersList', JSON.stringify(usersList));
+        renderUsers();
+      };
+
+      window.modifyUser = function(idx) {
+        const newName = prompt('Enter new name:', usersList[idx].name);
+        if (newName) {
+          usersList[idx].name = newName;
+          localStorage.setItem('usersList', JSON.stringify(usersList));
+          renderUsers();
+        }
+      };
+
+      if (createUserForm) {
+        createUserForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = usrNameInput.value.trim();
+          const email = usrEmailInput.value.trim();
+          const role = usrRoleSelect.value;
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (name && emailRegex.test(email) && role) {
+            usersList.push({
+              name: name,
+              email: email,
+              role: role,
+              perm: role === 'Admin' ? 'Root Admin' : 'Regular Account',
+              status: 'Active',
+              date: new Date().toISOString().split('T')[0]
+            });
+            localStorage.setItem('usersList', JSON.stringify(usersList));
+            usrNameInput.value = '';
+            usrEmailInput.value = '';
+            document.getElementById('usrPinInput').value = '';
+            renderUsers();
+          }
+        });
+      }
+
+      renderUsers();
     });
   </script>
+  <script src="js/main.js"></script>
 </body>
 </html>
