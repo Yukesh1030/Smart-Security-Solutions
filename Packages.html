@@ -35,9 +35,12 @@
 
   <main style="padding-top: var(--header-height);">
     <!-- Hero Sub -->
-    <section class="bg-dark" style="padding: 10rem 0 6rem; position: relative;">
-      <div class="gradient-overlay"></div>
-      <div class="container stagger-parent" style="text-align: center; max-width: 800px;">
+    <section class="bg-dark hero" style="padding: 10rem 0 6rem; position: relative;">
+      <div class="hero-bg">
+        <img src="assets/smart-home.webp" alt="Smart Home Background" style="opacity: 0.4;">
+        <div class="hero-overlay"></div>
+      </div>
+      <div class="container stagger-parent" style="text-align: center; max-width: 800px; position: relative; z-index: 1;">
         <h1>Curated Security Packages</h1>
         <p style="margin: 0 auto; font-size: 1.25rem;">Designed for every lifestyle. Experience the perfect balance of luxury and protection.</p>
       </div>
@@ -220,8 +223,14 @@
           </form>
         </div>
       </div>
-      <div class="footer-bottom" style="text-align: center; color: #ffffff;">
-        <p style="color: #ffffff; text-align: center; margin: 0;">&copy; 2026 Stackly Inc. All rights reserved. | <a href="404.html" style="color: #ffffff; text-decoration: underline;">Privacy Policy</a> | <a href="404.html" style="color: #ffffff; text-decoration: underline;">Terms of Service</a></p>
+      <div class="footer-bottom">
+        <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin: 0; font-size: 0.9rem;">
+          <span>&copy; 2026 Stackly Inc. All rights reserved.</span>
+          <span style="opacity: 0.5;">|</span>
+          <a href="404.html" style="color: #ffffff; text-decoration: underline; white-space: nowrap;">Privacy Policy</a>
+          <span style="opacity: 0.5;">|</span>
+          <a href="404.html" style="color: #ffffff; text-decoration: underline; white-space: nowrap;">Terms of Service</a>
+        </div>
       </div>
     </div>
   </footer>
