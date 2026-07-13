@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Stackly | Client Dashboard</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #0b0f17;
+      margin: 0;
+      color: #f7fafc;
+      font-family: "IBM Plex Mono", monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- SIDEBAR --- */
+    aside {
+      width: 280px;
+      background-color: #121824;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header img {
+      height: 30px;
+      filter: brightness(0) invert(1);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 1.5rem 0;
+      margin: 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .menu-item {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: #a0aec0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      color: #f7fafc;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .menu-item.active {
+      border-left-color: #4faf6b;
+      background: rgba(79, 175, 107, 0.05);
+      color: #4faf6b;
+    }
+
+    .menu-item i {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-logout {
+      width: 100%;
+      background: rgba(255, 59, 48, 0.1);
+      color: #ff3b30;
+      border: 1px solid rgba(255, 59, 48, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-logout:hover {
+      background: #ff3b30;
+      color: white;
+    }
+
+    /* --- MAIN CONTENT --- */
+    main {
+      margin-left: 280px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    /* --- TOP HEADER --- */
+    .top-bar {
+      height: 70px;
+      background-color: #121824;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      box-sizing: border-box;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #f7fafc;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #4faf6b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+    }
+
+    .content-area {
+      padding: 2.5rem;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* --- TAB VIEWS --- */
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    .tab-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .tab-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .tab-header p {
+      color: #a0aec0;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    /* --- DEVICE CONTROLS --- */
+    .device-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .device-card {
+      background-color: #121824;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .device-card:hover {
+      border-color: rgba(79, 175, 107, 0.3);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .device-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: #a0aec0;
+      transition: all 0.3s ease;
+    }
+
+    .device-card.active .device-icon {
+      background: rgba(79, 175, 107, 0.1);
+      color: #4faf6b;
+    }
+
+    .device-body h3 {
+      font-size: 1.05rem;
+      margin: 0 0 0.25rem 0;
+      font-weight: 700;
+    }
+
+    .device-body p {
+      font-size: 0.8rem;
+      color: #a0aec0;
+      margin: 0 0 1.5rem 0;
+    }
+
+    .device-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #2d3748;
+      transition: .3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4faf6b;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* --- THERMOSTAT CONTROLLER --- */
+    .temp-control {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .temp-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .temp-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    .temp-display {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    /* --- DATA CARDS --- */
+    .data-card {
+      background-color: #121824;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      opacity: 0; /* Animated by GSAP ScrollTrigger */
+    }
+
+    /* --- ALERT FEED --- */
+    .alert-item {
+      background-color: #121824;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .alert-item:hover {
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .alert-main {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .alert-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #a0aec0;
+    }
+
+    .alert-dot.unread {
+      background-color: #ff3b30;
+      box-shadow: 0 0 8px #ff3b30;
+    }
+
+    .alert-details h4 {
+      font-size: 0.9rem;
+      margin: 0 0 0.25rem 0;
+      font-weight: 700;
+    }
+
+    .alert-details p {
+      font-size: 0.8rem;
+      color: #a0aec0;
+      margin: 0;
+    }
+
+    .alert-time {
+      font-size: 0.8rem;
+      color: #718096;
+    }
+
+    /* --- BADGES --- */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-success { background: rgba(79, 175, 107, 0.1); color: #4faf6b; }
+    .badge-warning { background: rgba(255, 149, 0, 0.1); color: #ff9500; }
+    .badge-danger { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
+
+    /* --- FORMS --- */
+    .form-card {
+      background-color: #121824;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 600px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #a0aec0;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      color: white;
+      font-size: 16px;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #4faf6b;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .btn-save {
+      background-color: #4faf6b;
+      color: white;
+      border-radius: 30px;
+      border: none;
+      padding: 0.85rem 2rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 10px rgba(79, 175, 107, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .btn-save:hover {
+      background-color: #3b9052;
+    }
+
+    .btn-outline-sm {
+      background-color: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-outline-sm:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+
+    /* --- RESPONSIVE SIDEBAR BACKDROP --- */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      z-index: 90;
+    }
+
+    /* --- MOBILE VIEWS --- */
+    @media (max-width: 1024px) {
+      aside {
+        transform: translateX(-100%);
+      }
+
+      aside.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+
+      main {
+        margin-left: 0;
+      }
+
+      .mobile-nav-toggle {
+        display: block;
+      }
+
+      .content-area {
+        padding: 1.5rem 1rem;
+      }
+
+      .top-bar {
+        padding: 0 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .device-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+      }
+      .device-card {
+        padding: 1rem;
+        border-radius: 12px;
+      }
+      .form-card {
+        padding: 1.25rem 1rem;
+        border-radius: 12px;
+      }
+      .data-card {
+        padding: 1.25rem 1rem;
+        margin-bottom: 1.25rem;
+        border-radius: 12px;
+      }
+      .tab-header {
+        margin-bottom: 1.5rem;
+      }
+      .tab-header h1 {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .user-info span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/Brand Logo.webp" alt="Stackly Logo">
+      <div class="mobile-nav-toggle" id="closeSidebar" style="font-size: 1.25rem;"><i class="fas fa-times"></i></div>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="menu-item active" data-tab="my-devices">
+        <i class="fas fa-mobile-alt"></i>
+        <span>My Devices</span>
+      </li>
+      <li class="menu-item" data-tab="live-mon">
+        <i class="fas fa-eye"></i>
+        <span>Live Monitoring</span>
+      </li>
+      <li class="menu-item" data-tab="alerts-notif">
+        <i class="fas fa-bell"></i>
+        <span>Alerts & Notifications</span>
+      </li>
+      <li class="menu-item" data-tab="profile-pref">
+        <i class="fas fa-user-cog"></i>
+        <span>Profile & Preferences</span>
+      </li>
+    </ul>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="window.location.href='login.html'">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WINDOW -->
+  <main>
+    <div class="top-bar">
+      <div class="mobile-nav-toggle" id="openSidebar">
+        <i class="fas fa-bars"></i>
+      </div>
+      <div style="font-weight: 700; font-size: clamp(0.85rem, 3.5vw, 1.1rem); color: #4faf6b; text-align: center; margin: 0 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">SMART CIRCUIT // CLIENT</div>
+      <div class="user-info">
+        <span id="userNameDisplay" style="font-size: 0.9rem; color: #a0aec0;">John Doe</span>
+        <div id="userAvatarDisplay" class="user-avatar">JD</div>
+      </div>
+    </div>
+
+    <div class="content-area">
+      
+      <!-- 1. MY DEVICES -->
+      <div class="tab-pane active" id="my-devices">
+        <div class="tab-header animate-fade-up">
+          <h1>My Devices</h1>
+          <p>Control locks, thermostats, sensors, and cameras throughout your home.</p>
+        </div>
+
+        <!-- Section 1: Devices Control Grid -->
+        <div class="device-grid">
+          
+          <!-- Front Door Lock -->
+          <div class="device-card active" id="card-front-door">
+            <div class="device-header">
+              <div class="device-icon"><i class="fas fa-lock"></i></div>
+              <span class="badge badge-success" id="status-front-door">LOCKED</span>
+            </div>
+            <div class="device-body">
+              <h3>Front Door Lock</h3>
+              <p>Main Entrance Access Control</p>
+            </div>
+            <div class="device-footer">
+              <span style="font-size: 0.8rem; color: #718096;"><i class="fas fa-battery-three-quarters"></i> 85% Battery</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-front-door" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Thermostat -->
+          <div class="device-card active">
+            <div class="device-header">
+              <div class="device-icon"><i class="fas fa-thermometer-half"></i></div>
+              <span class="badge badge-success">HEATING</span>
+            </div>
+            <div class="device-body">
+              <h3>Living Thermostat</h3>
+              <p>Target Climate Control</p>
+              <div class="temp-control">
+                <button class="temp-btn" id="temp-down">-</button>
+                <div class="temp-display"><span id="temp-val">72</span>°F</div>
+                <button class="temp-btn" id="temp-up">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Garage Door -->
+          <div class="device-card" id="card-garage">
+            <div class="device-header">
+              <div class="device-icon"><i class="fas fa-warehouse"></i></div>
+              <span class="badge badge-warning" id="status-garage">OPEN</span>
+            </div>
+            <div class="device-body">
+              <h3>Garage Door</h3>
+              <p>Vehicle Bay Access</p>
+            </div>
+            <div class="device-footer">
+              <span style="font-size: 0.8rem; color: #718096;"><i class="fas fa-plug"></i> Main Power</span>
+              <label class="switch">
+                <input type="checkbox" id="toggle-garage">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Motion Detector -->
+          <div class="device-card active">
+            <div class="device-header">
+              <div class="device-icon"><i class="fas fa-running"></i></div>
+              <span class="badge badge-success">ARMED</span>
+            </div>
+            <div class="device-body">
+              <h3>Hallway Sensor</h3>
+              <p>Motion Intruder Alert Grid</p>
+            </div>
+            <div class="device-footer">
+              <span style="font-size: 0.8rem; color: #718096;"><i class="fas fa-battery-full"></i> 100%</span>
+              <label class="switch">
+                <input type="checkbox" checked disabled>
+                <span class="slider" style="opacity: 0.6; cursor: not-allowed;"></span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Section 2: Quick Actions Panel -->
+        <div class="data-card animate-fade-up">
+          <h2>Quick Actions</h2>
+          <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 1.5rem;">Control your whole home security layout with a single tap.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+            <button class="btn-save" style="border-radius: 12px; padding: 1rem;" onclick="alert('All doors locked successfully!')">Lock All Doors</button>
+            <button class="btn-save" style="background: #007aff; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2); border-radius: 12px; padding: 1rem;" onclick="alert('Entire grid armed!')">Arm System</button>
+            <button class="btn-outline-sm" style="padding: 1rem; border-radius: 12px;" onclick="alert('Eco savings mode active')">Eco Temp Profile</button>
+          </div>
+        </div>
+
+        <!-- Section 3: Device Activity Timeline -->
+        <div class="data-card animate-fade-up">
+          <h2>Device Activity Log</h2>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.85rem; margin-top: 1.25rem;">
+            <div style="border-left: 2px solid #4faf6b; padding-left: 1rem;">
+              <strong style="color: #4faf6b;">[10:15 AM]</strong> Front Door Lock closed by profile: John Doe.
+            </div>
+            <div style="border-left: 2px solid #ff9500; padding-left: 1rem;">
+              <strong style="color: #ff9500;">[09:42 AM]</strong> Garage Door was opened manually.
+            </div>
+            <div style="border-left: 2px solid #a0aec0; padding-left: 1rem;">
+              <strong style="color: #a0aec0;">[07:00 AM]</strong> Living Thermostat set temperature schedule to 72°F.
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Smart Lighting Controller -->
+        <div class="data-card animate-fade-up">
+          <h2>Smart Ambient Lighting</h2>
+          <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <span>Living Room Chandelier</span>
+              <input type="range" min="0" max="100" value="80" style="accent-color: #4faf6b;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <span>Front Porch Floodlights</span>
+              <input type="range" min="0" max="100" value="40" style="accent-color: #4faf6b;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Battery Health Monitor -->
+        <div class="data-card animate-fade-up">
+          <h2>Battery Diagnostics</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+              <span style="font-size: 0.8rem; color: #a0aec0; display: block; margin-bottom: 0.25rem;">Front Door Lock</span>
+              <strong style="color: #4faf6b;">85% (Healthy)</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+              <span style="font-size: 0.8rem; color: #a0aec0; display: block; margin-bottom: 0.25rem;">Kitchen Smoke Tag</span>
+              <strong style="color: #ff9500;">14% (Replace Soon)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: Automated Rules Scheduler -->
+        <div class="data-card animate-fade-up">
+          <h2>Home Automations Rules</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 1rem; border-radius: 8px;">
+              <span>Lock doors automatically at 10:00 PM</span>
+              <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #4faf6b;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 1rem; border-radius: 8px;">
+              <span>Turn porch lights on at Sunset</span>
+              <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #4faf6b;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 2. LIVE MONITORING -->
+      <div class="tab-pane" id="live-mon">
+        <div class="tab-header animate-fade-up">
+          <h1>Live Monitoring</h1>
+          <p>Watch real-time surveillance streams and review captured event logs.</p>
+        </div>
+
+        <!-- Section 1: Main Camera Feed Viewport -->
+        <div class="data-card animate-fade-up" style="max-width: 800px; padding: 0; overflow: hidden;">
+          <div style="width: 100%; aspect-ratio: 16/9; background: #1c2331; display: flex; align-items: center; justify-content: center; position: relative;">
+            <i class="fas fa-video-slash" style="font-size: 3rem; color: #4a5568;"></i>
+            <span style="position: absolute; bottom: 1rem; left: 1rem; background: rgba(0,0,0,0.6); padding: 0.35rem 0.75rem; font-size: 0.85rem; border-radius: 4px;" id="mainFeedTitle">Main Camera: Front Porch</span>
+            <span style="position: absolute; top: 1rem; right: 1rem; background: #ff3b30; color: white; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: 700; text-transform: uppercase; animation: pulse 1.5s infinite;">LIVE</span>
+          </div>
+          <div style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h3 style="margin: 0 0 0.25rem 0; font-size: 1.1rem;" id="activeCamName">Front Porch Camera Pro</h3>
+              <span style="font-size: 0.85rem; color: #a0aec0;">Status: Streaming HD // 24 FPS</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button class="btn-save" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="alert('Mic feed activated!')"><i class="fas fa-microphone"></i> Talk</button>
+              <button class="btn-outline-sm" onclick="alert('Triggering warning siren!')"><i class="fas fa-bullhorn"></i> Sound Siren</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Multi-Camera Feed Selector -->
+        <div class="data-card animate-fade-up">
+          <h2>Select surveillance channel</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid #4faf6b;" onclick="document.getElementById('mainFeedTitle').innerText='Main Camera: Front Porch'; document.getElementById('activeCamName').innerText='Front Porch Camera Pro';">
+              <span style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Porch Cam</span>
+              <span style="font-size: 0.75rem; color: #4faf6b;">Connected</span>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid transparent;" onclick="document.getElementById('mainFeedTitle').innerText='Main Camera: Backyard View'; document.getElementById('activeCamName').innerText='Backyard CCTV Stream';">
+              <span style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Backyard Cam</span>
+              <span style="font-size: 0.75rem; color: #4faf6b;">Connected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Two-Way Audio Controller -->
+        <div class="data-card animate-fade-up">
+          <h2>Two-Way Audio Diagnostic</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.25rem;">
+            <div>
+              <span style="font-size: 0.8rem; color: #a0aec0; display: block; margin-bottom: 0.5rem;">Microphone Volume Gain</span>
+              <input type="range" min="0" max="100" value="70" style="width: 100%; accent-color: #4faf6b;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Warning Siren Panic Button -->
+        <div class="data-card animate-fade-up" style="border: 1px solid rgba(255,59,48,0.15); background: rgba(255,59,48,0.02);">
+          <h2 style="color: #ff3b30;"><i class="fas fa-exclamation-circle"></i> Emergency Warning Panic Control</h2>
+          <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 1.5rem;">Trigger the outdoor siren manual alarm instantly in case of manual breach sightings.</p>
+          <button class="btn-save" style="background: #ff3b30; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.2);" onclick="confirm('Trigger manual panic alarm siren?')">Sound Panic Siren Now</button>
+        </div>
+
+        <!-- Section 5: Recorded Clips Gallery -->
+        <div class="data-card animate-fade-up">
+          <h2>Recent Motion Recordings</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
+            <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong style="display: block; font-size: 0.85rem;">Clip_FrontPorch_0942</strong>
+                <span style="font-size: 0.75rem; color: #a0aec0;">Today, 09:42 AM // 15s</span>
+              </div>
+              <button class="btn-outline-sm" onclick="alert('Downloading clip...')"><i class="fas fa-download"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: Storage Sync details -->
+        <div class="data-card animate-fade-up">
+          <h2>Cloud Archival Status</h2>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;">
+            <div>
+              <strong style="font-size: 1.3rem; display: block; margin-bottom: 0.25rem;">12.4 GB / 100 GB Used</strong>
+              <span style="font-size: 0.8rem; color: #a0aec0;">Auto-syncing footage clips to cloud folder.</span>
+            </div>
+            <button class="btn-outline-sm" onclick="alert('Clearing backup cache...')">Clear Cache</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. ALERTS & NOTIFICATIONS -->
+      <div class="tab-pane" id="alerts-notif">
+        <div class="tab-header animate-fade-up">
+          <h1>Alerts & Notifications</h1>
+          <p>Check recent warning reports, sensor detections, and grid activity logs.</p>
+        </div>
+
+        <!-- Section 1: Alert Log Feed -->
+        <div class="data-card animate-fade-up" style="max-width: 800px; margin-bottom: 1.5rem;">
+          <div class="alert-item">
+            <div class="alert-main">
+              <div class="alert-dot unread"></div>
+              <div class="alert-details">
+                <h4>Front Door Unlocked</h4>
+                <p>Access granted to profile: John Doe.</p>
+              </div>
+            </div>
+            <span class="alert-time">10:15 AM</span>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-main">
+              <div class="alert-dot unread"></div>
+              <div class="alert-details">
+                <h4>Motion Detected</h4>
+                <p>Front Porch Camera recorded motion near entrance path.</p>
+              </div>
+            </div>
+            <span class="alert-time">09:42 AM</span>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-main">
+              <div class="alert-dot"></div>
+              <div class="alert-details">
+                <h4>Thermostat Config Changed</h4>
+                <p>Target temperature adjusted to 72°F.</p>
+              </div>
+            </div>
+            <span class="alert-time">Yesterday</span>
+          </div>
+        </div>
+
+        <!-- Section 2: Notification Preferences -->
+        <div class="data-card animate-fade-up">
+          <h2>Push Alert Preferences</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Intruder Alarm Motion Detections</span>
+              <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #4faf6b;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Device Battery Critical Warnings</span>
+              <input type="checkbox" checked style="width: 16px; height: 16px; accent-color: #4faf6b;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Alert History Search Tool -->
+        <div class="data-card animate-fade-up">
+          <h2>Search Alert Logs Archive</h2>
+          <div class="form-grid" style="margin-top: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Search Query</label>
+              <input type="text" class="form-control" placeholder="e.g. Front Door">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date Filter</label>
+              <input type="date" class="form-control" value="2026-07-13">
+            </div>
+          </div>
+          <button class="btn-save" onclick="alert('Searching archives...')">Filter Logs</button>
+        </div>
+
+        <!-- Section 4: Security Safety Score -->
+        <div class="data-card animate-fade-up">
+          <h2>Home Security Score Status</h2>
+          <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1.25rem;">
+            <div style="width: 60px; height: 60px; border-radius: 50%; border: 4px solid #4faf6b; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; color: #4faf6b;">98%</div>
+            <div>
+              <strong style="display: block; font-size: 0.95rem;">Grid Protection Level: Secure</strong>
+              <span style="font-size: 0.8rem; color: #a0aec0;">No unresolved warning triggers detected.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Blueprint Zone Map -->
+        <div class="data-card animate-fade-up">
+          <h2>Active Warning Beacons</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-top: 1.25rem;">
+            <div style="background: rgba(79, 175, 107, 0.05); border: 1px solid rgba(79, 175, 107, 0.2); padding: 1rem; border-radius: 8px; text-align: center;">
+              <span style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Living Room</span>
+              <span style="font-size: 0.75rem; color: #4faf6b;">Secure</span>
+            </div>
+            <div style="background: rgba(79, 175, 107, 0.05); border: 1px solid rgba(79, 175, 107, 0.2); padding: 1rem; border-radius: 8px; text-align: center;">
+              <span style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 0.25rem;">Front Door</span>
+              <span style="font-size: 0.75rem; color: #4faf6b;">Secure</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: Emergency Tech Support Contact -->
+        <div class="data-card animate-fade-up">
+          <h2>Direct Support Helpdesk</h2>
+          <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 1.5rem;">Forward troubleshooting diagnostics reports to client support instantly.</p>
+          <button class="btn-save" onclick="alert('Diagnostics packet forwarded successfully!')"><i class="fas fa-paper-plane"></i> Send Diagnostics Report</button>
+        </div>
+
+      </div>
+
+      <!-- 4. PROFILE & PREFERENCES -->
+      <div class="tab-pane" id="profile-pref">
+        <div class="tab-header animate-fade-up">
+          <h1>Profile & Preferences</h1>
+          <p>Manage account settings, security codes, and notification preferences.</p>
+        </div>
+
+        <!-- Section 1: Settings Form -->
+        <div class="form-card animate-fade-up" style="margin-bottom: 2rem;">
+          <form onsubmit="event.preventDefault(); alert('Profile preferences updated!');">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-control" value="John Doe">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" value="john@stackly.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Master PIN</label>
+              <input type="password" class="form-control" value="123456" placeholder="Enter secure PIN">
+            </div>
+
+            <button type="submit" class="btn-save">Save Settings</button>
+          </form>
+        </div>
+
+        <!-- Section 2: Authorized Shared Accounts -->
+        <div class="data-card animate-fade-up">
+          <h2>Shared Accounts Access</h2>
+          <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 1.5rem;">Grant local device lock and monitor control access to family member emails.</p>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 1rem; border-radius: 8px;">
+              <span>family@stackly.com (Viewer)</span>
+              <button class="btn-outline-sm" style="color: #ff3b30; border-color: rgba(255,59,48,0.2);" onclick="alert('Access revoked')">Revoke</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Two-Factor Auth Configuration -->
+        <div class="data-card animate-fade-up">
+          <h2>Grid Two-Factor Authentication (2FA)</h2>
+          <div class="form-grid" style="margin-top: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Backup Phone Number</label>
+              <input type="text" class="form-control" value="+1 (555) 902-1202">
+            </div>
+          </div>
+          <button class="btn-save" onclick="alert('Test verification SMS sent!')">Send Verification Code</button>
+        </div>
+
+        <!-- Section 4: Geofencing Auto-Locks -->
+        <div class="data-card animate-fade-up">
+          <h2>Geofencing Proximity Settings</h2>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem;">
+            <div>
+              <strong style="display: block; font-size: 0.95rem;">Lock Doors Automatically on Departure</strong>
+              <span style="font-size: 0.8rem; color: #a0aec0;">Locks entrance nodes when your mobile GPS leaves 100m radius.</span>
+            </div>
+            <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #4faf6b;">
+          </div>
+        </div>
+
+        <!-- Section 5: Voice Integrations Hub -->
+        <div class="data-card animate-fade-up">
+          <h2>Voice Hub Synced Nodes</h2>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.25rem;">
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fab fa-google" style="color: #007aff;"></i> Google Assistant
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fab fa-apple" style="color: white;"></i> Apple HomeKit
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: Danger Zone actions -->
+        <div class="data-card animate-fade-up" style="border: 1px solid rgba(255,59,48,0.2); background: rgba(255,59,48,0.01);">
+          <h2 style="color: #ff3b30;">Danger Zone</h2>
+          <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 1.5rem;">Permanently wipe cache telemetry files or request account deletion.</p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-outline-sm" style="border-color: rgba(255,59,48,0.3); color: #ff3b30;" onclick="alert('Local database sync files cleared!')">Wipe Local Database Syncs</button>
+            <button class="btn-save" style="background: #ff3b30; box-shadow: 0 4px 10px rgba(255, 59, 48, 0.2);" onclick="confirm('Request profile removal?')">Delete Account</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuItems = document.querySelectorAll('.menu-item');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const openSidebarBtn = document.getElementById('openSidebar');
+      const closeSidebarBtn = document.getElementById('closeSidebar');
+
+      // Initialize GSAP ScrollTrigger
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Setup ScrollTriggers for data cards
+        gsap.utils.toArray('.animate-fade-up').forEach(card => {
+          gsap.fromTo(card, 
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 95%",
+                toggleActions: "play none none none"
+              }
+            }
+          );
+        });
+      }
+
+      // Tab Switching with GSAP animations
+      menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const tabId = item.getAttribute('data-tab');
+
+          menuItems.forEach(i => i.classList.remove('active'));
+          tabPanes.forEach(pane => pane.classList.remove('active'));
+
+          item.classList.add('active');
+          const targetPane = document.getElementById(tabId);
+          targetPane.classList.add('active');
+
+          // GSAP fade & slide up transition on active panel first elements
+          gsap.fromTo(targetPane.querySelectorAll('.tab-header, .device-grid, .data-card, .form-card'), 
+            { opacity: 0, y: 20 },
+            { 
+              opacity: 1, 
+              y: 0, 
+              duration: 0.5, 
+              stagger: 0.08, 
+              ease: "power2.out",
+              onComplete: () => {
+                // Refresh ScrollTriggers for layout calculations
+                if (typeof ScrollTrigger !== 'undefined') {
+                  ScrollTrigger.refresh();
+                }
+              }
+            }
+          );
+
+          if (window.innerWidth <= 1024) {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('open');
+          }
+        });
+      });
+
+      // Mobile Sidebar Actions
+      openSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('open');
+      });
+
+      closeSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+      });
+
+      sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+      });
+
+      // Smart Devices Interactivity Simulation
+      // 1. Lock Control Toggle
+      const toggleLock = document.getElementById('toggle-front-door');
+      const statusLock = document.getElementById('status-front-door');
+      const cardLock = document.getElementById('card-front-door');
+
+      if (toggleLock) {
+        toggleLock.addEventListener('change', () => {
+          if (toggleLock.checked) {
+            statusLock.innerText = 'LOCKED';
+            statusLock.className = 'badge badge-success';
+            cardLock.classList.add('active');
+          } else {
+            statusLock.innerText = 'UNLOCKED';
+            statusLock.className = 'badge badge-danger';
+            cardLock.classList.remove('active');
+          }
+        });
+      }
+
+      // 2. Garage Toggle
+      const toggleGarage = document.getElementById('toggle-garage');
+      const statusGarage = document.getElementById('status-garage');
+      const cardGarage = document.getElementById('card-garage');
+
+      if (toggleGarage) {
+        toggleGarage.addEventListener('change', () => {
+          if (toggleGarage.checked) {
+            statusGarage.innerText = 'CLOSED';
+            statusGarage.className = 'badge badge-success';
+            cardGarage.classList.add('active');
+          } else {
+            statusGarage.innerText = 'OPEN';
+            statusGarage.className = 'badge badge-warning';
+            cardGarage.classList.remove('active');
+          }
+        });
+      }
+
+      // 3. Thermostat controls
+      const tempVal = document.getElementById('temp-val');
+      const tempUp = document.getElementById('temp-up');
+      const tempDown = document.getElementById('temp-down');
+
+      if (tempVal && tempUp && tempDown) {
+        let currentTemp = 72;
+        tempUp.addEventListener('click', () => {
+          currentTemp++;
+          tempVal.innerText = currentTemp;
+        });
+        tempDown.addEventListener('click', () => {
+          currentTemp--;
+          tempVal.innerText = currentTemp;
+        });
+      }
+
+      // Retrieve current login user name
+      const storedEmail = localStorage.getItem('currentUserEmail') || 'John Doe';
+      const cleanUsername = storedEmail.split('@')[0];
+      const nameDisplay = document.getElementById('userNameDisplay');
+      const avatarDisplay = document.getElementById('userAvatarDisplay');
+      if (nameDisplay && avatarDisplay) {
+        nameDisplay.innerText = cleanUsername;
+        avatarDisplay.innerText = cleanUsername.charAt(0).toUpperCase();
+      }
+    });
+  </script>
+</body>
+</html>

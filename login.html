@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stackly | Login</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f7fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      color: #2d3748;
+      position: relative;
+      font-family: "IBM Plex Mono", monospace;
+    }
+    
+    .back-home-container {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      z-index: 10;
+    }
+
+    .btn-back-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 0.6rem 1.25rem;
+      border-radius: 30px;
+      color: #4a5568;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.85rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .btn-back-home:hover {
+      background: #f7fafc;
+      color: #1a202c;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    }
+
+    .auth-card {
+      background: white;
+      padding: 3.5rem 3rem;
+      border-radius: 24px;
+      border: 1px solid #edf2f7;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    .auth-card img.logo {
+      height: 36px;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-card h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #2d3748;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-card p.subtitle {
+      color: #718096;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #a0aec0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px solid #cbd5e0;
+      background: white;
+      color: #2d3748;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #4faf6b;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #a0aec0;
+      transition: color 0.2s ease;
+    }
+
+    .password-toggle:hover {
+      color: #4a5568;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #718096;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-container input {
+      accent-color: #4faf6b;
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: #4faf6b;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-link:hover {
+      color: #3b9052;
+    }
+
+    .btn-login {
+      width: 100%;
+      background-color: #4faf6b;
+      color: white;
+      border-radius: 30px;
+      border: none;
+      padding: 1rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 10px rgba(79, 175, 107, 0.2);
+      transition: all 0.2s ease;
+      margin-top: 1rem;
+    }
+
+    .btn-login:hover {
+      background-color: #3b9052;
+      box-shadow: 0 6px 15px rgba(79, 175, 107, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-login:active {
+      transform: translateY(1px);
+    }
+
+    .auth-footer {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: #718096;
+    }
+
+    .auth-footer a {
+      color: #4faf6b;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .auth-footer a:hover {
+      color: #3b9052;
+    }
+
+    .error-message {
+      color: #e53e3e;
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="back-home-container">
+    <a href="index.html" class="btn-back-home">
+      <i class="fas fa-arrow-left"></i> BACK TO HOME
+    </a>
+  </div>
+
+  <div class="auth-card">
+    <a href="index.html">
+      <img src="assets/Brand Logo.webp" alt="Stackly Logo" class="logo">
+    </a>
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Enter your credentials to access the circuit.</p>
+    
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="role" class="form-label">Login As</label>
+        <select id="role" class="form-control" style="appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23a0aec0\' height=\'24\' viewBox=\'0 0 24 24\' width=\'24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/><path d=\'M0 0h24v24H0z\' fill=\'none\'/></svg>'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5rem;">
+          <option value="Admin">Admin</option>
+          <option value="Client" selected>Client</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="name@company.com" required>
+        <div class="error-message" id="emailError">Please enter a valid email address.</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+          <span class="password-toggle" id="passwordToggle">
+            <i class="fas fa-eye"></i>
+          </span>
+        </div>
+        <div class="error-message" id="passwordError">Please enter your password.</div>
+      </div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <label class="checkbox-container">
+          <input type="checkbox" checked>
+          <span>Remember me</span>
+        </label>
+        <a href="404.html" class="forgot-link">Forgot password?</a>
+      </div>
+      
+      <button type="submit" class="btn-login">Login to Account</button>
+    </form>
+    
+    <div class="auth-footer">
+      New here? <a href="signup.html">Create an account</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle Password Visibility
+      const passwordInput = document.getElementById('password');
+      const passwordToggle = document.getElementById('passwordToggle');
+      
+      passwordToggle.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        const icon = passwordToggle.querySelector('i');
+        if (type === 'text') {
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+
+      // Handle Form Submit and Validation
+      const form = document.getElementById('loginForm');
+      const emailInput = document.getElementById('email');
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        let isValid = true;
+
+        // Reset errors
+        emailInput.style.borderColor = '#cbd5e0';
+        passwordInput.style.borderColor = '#cbd5e0';
+        emailError.style.display = 'none';
+        passwordError.style.display = 'none';
+
+        // Validate Email
+        const emailVal = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailVal || !emailRegex.test(emailVal)) {
+          isValid = false;
+          emailInput.style.borderColor = '#e53e3e';
+          emailError.style.display = 'block';
+        }
+
+        // Validate Password
+        const passwordVal = passwordInput.value.trim();
+        if (!passwordVal) {
+          isValid = false;
+          passwordInput.style.borderColor = '#e53e3e';
+          passwordError.style.display = 'block';
+        }
+
+        if (isValid) {
+          localStorage.setItem('currentUserEmail', emailVal);
+          const role = document.getElementById('role').value;
+          if (role === 'Admin') {
+            window.location.href = 'AdminDashboard.html';
+          } else {
+            window.location.href = 'ClientDashboard.html';
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

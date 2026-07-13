@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Stackly | Admin Dashboard</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #0b0f17;
+      margin: 0;
+      color: #f7fafc;
+      font-family: "IBM Plex Mono", monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* --- SIDEBAR --- */
+    aside {
+      width: 280px;
+      background-color: #121824;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar-header {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header img {
+      height: 30px;
+      filter: brightness(0) invert(1);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 1.5rem 0;
+      margin: 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .menu-item {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: #a0aec0;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .menu-item:hover, .menu-item.active {
+      color: #f7fafc;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .menu-item.active {
+      border-left-color: #007aff;
+      background: rgba(0, 122, 255, 0.05);
+      color: #007aff;
+    }
+
+    .menu-item i {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .btn-logout {
+      width: 100%;
+      background: rgba(255, 59, 48, 0.1);
+      color: #ff3b30;
+      border: 1px solid rgba(255, 59, 48, 0.2);
+      border-radius: 12px;
+      padding: 0.75rem;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-logout:hover {
+      background: #ff3b30;
+      color: white;
+    }
+
+    /* --- MAIN CONTENT --- */
+    main {
+      margin-left: 280px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* --- TOP HEADER --- */
+    .top-bar {
+      height: 70px;
+      background-color: #121824;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      box-sizing: border-box;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #f7fafc;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #007aff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: white;
+    }
+
+    .content-area {
+      padding: 2.5rem;
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* --- TAB VIEWS --- */
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    .tab-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .tab-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .tab-header p {
+      color: #a0aec0;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background-color: #121824;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(0, 122, 255, 0.1);
+      color: #007aff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .stat-details h3 {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: #a0aec0;
+      margin: 0 0 0.25rem 0;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-details p {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .data-card {
+      background-color: #121824;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      opacity: 0; /* Animated by GSAP ScrollTrigger */
+    }
+
+    .card-header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header-flex h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    /* --- TABLES --- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 1rem;
+      border-bottom: 2px solid rgba(255,255,255,0.05);
+      color: #a0aec0;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    td {
+      padding: 1.2rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      font-size: 0.9rem;
+    }
+
+    /* --- BADGES & BUTTONS --- */
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-success { background: rgba(79, 175, 107, 0.1); color: #4faf6b; }
+    .badge-warning { background: rgba(255, 149, 0, 0.1); color: #ff9500; }
+    .badge-danger { background: rgba(255, 59, 48, 0.1); color: #ff3b30; }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary-sm { background-color: #007aff; color: white; }
+    .btn-primary-sm:hover { background-color: #0056b3; }
+
+    .btn-outline-sm { background-color: transparent; border-color: rgba(255,255,255,0.1); color: #f7fafc; }
+    .btn-outline-sm:hover { background-color: rgba(255,255,255,0.05); }
+
+    .btn-danger-sm { background-color: rgba(255,59,48,0.1); color: #ff3b30; border-color: rgba(255,59,48,0.2); }
+    .btn-danger-sm:hover { background-color: #ff3b30; color: white; }
+
+    /* --- FORMS --- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #a0aec0;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.02);
+      color: white;
+      font-size: 16px;
+      font-family: inherit;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #007aff;
+      background: rgba(255,255,255,0.05);
+    }
+
+    /* --- RESPONSIVE TABLES ON MOBILE --- */
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+      tr {
+        border: 1px solid rgba(255,255,255,0.05);
+        margin-bottom: 1rem;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.01);
+        padding: 0.5rem;
+      }
+      td {
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        position: relative;
+        padding-left: 50% !important;
+        text-align: right;
+        min-height: 2.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        box-sizing: border-box;
+      }
+      td:last-child {
+        border-bottom: none;
+      }
+      td:before {
+        position: absolute;
+        left: 1rem;
+        content: attr(data-label);
+        font-weight: 700;
+        color: #a0aec0;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+      }
+    }
+
+    /* --- RESPONSIVE SIDEBAR BACKDROP --- */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      z-index: 90;
+    }
+
+    /* --- MOBILE VIEWS --- */
+    @media (max-width: 1024px) {
+      aside {
+        transform: translateX(-100%);
+      }
+
+      aside.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+
+      main {
+        margin-left: 0;
+      }
+
+      .mobile-nav-toggle {
+        display: block;
+      }
+      
+      .content-area {
+        padding: 1.5rem 1rem;
+      }
+
+      .top-bar {
+        padding: 0 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+      }
+      .data-card {
+        padding: 1.25rem 1rem;
+        margin-bottom: 1.25rem;
+        border-radius: 12px;
+      }
+      .tab-header {
+        margin-bottom: 1.5rem;
+      }
+      .tab-header h1 {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .user-info span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <img src="assets/Brand Logo.webp" alt="Stackly Logo">
+      <div class="mobile-nav-toggle" id="closeSidebar" style="font-size: 1.25rem;"><i class="fas fa-times"></i></div>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="menu-item active" data-tab="device-mgmt">
+        <i class="fas fa-microchip"></i>
+        <span>Device Management</span>
+      </li>
+      <li class="menu-item" data-tab="user-mgmt">
+        <i class="fas fa-users"></i>
+        <span>User Management</span>
+      </li>
+      <li class="menu-item" data-tab="security-alerts">
+        <i class="fas fa-bell"></i>
+        <span>Security Alerts</span>
+      </li>
+      <li class="menu-item" data-tab="camera-mon">
+        <i class="fas fa-video"></i>
+        <span>Camera Monitoring</span>
+      </li>
+      <li class="menu-item" data-tab="reports-analytics">
+        <i class="fas fa-chart-line"></i>
+        <span>Reports & Analytics</span>
+      </li>
+      <li class="menu-item" data-tab="system-settings">
+        <i class="fas fa-cog"></i>
+        <span>System Settings</span>
+      </li>
+    </ul>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="window.location.href='login.html'">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WINDOW -->
+  <main>
+    <div class="top-bar">
+      <div class="mobile-nav-toggle" id="openSidebar">
+        <i class="fas fa-bars"></i>
+      </div>
+      <div style="font-weight: 700; font-size: clamp(0.85rem, 3.5vw, 1.1rem); color: #007aff; text-align: center; margin: 0 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">SYSTEM PORTAL // ADMIN</div>
+      <div class="user-info">
+        <span id="userNameDisplay" style="font-size: 0.9rem; color: #a0aec0;">Admin Control</span>
+        <div id="userAvatarDisplay" class="user-avatar">A</div>
+      </div>
+    </div>
+
+    <div class="content-area">
+      
+      <!-- 1. DEVICE MANAGEMENT -->
+      <div class="tab-pane active" id="device-mgmt">
+        <div class="tab-header animate-fade-up">
+          <h1>Device Management</h1>
+          <p>Add, edit, remove, and monitor all smart security hardware on the grid.</p>
+        </div>
+
+        <!-- Section 1: Hardware Registry -->
+        <div class="data-card animate-fade-up">
+          <div class="card-header-flex">
+            <h2>Hardware Registry</h2>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Device Name</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Battery</th>
+                  <th>Connection</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Device Name">Front Gate CCTV</td>
+                  <td data-label="Type">Camera</td>
+                  <td data-label="Status"><span class="badge badge-success">Online</span></td>
+                  <td data-label="Battery">100% (AC)</td>
+                  <td data-label="Connection">94 ms</td>
+                  <td data-label="Actions">
+                    <button class="btn-sm btn-outline-sm">Edit</button>
+                    <button class="btn-sm btn-danger-sm">Remove</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Device Name">Front Door Lock</td>
+                  <td data-label="Type">Smart Lock</td>
+                  <td data-label="Status"><span class="badge badge-success">Online</span></td>
+                  <td data-label="Battery">85%</td>
+                  <td data-label="Connection">12 ms</td>
+                  <td data-label="Actions">
+                    <button class="btn-sm btn-outline-sm">Edit</button>
+                    <button class="btn-sm btn-danger-sm">Remove</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="Device Name">Kitchen Smoke Detector</td>
+                  <td data-label="Type">Sensor</td>
+                  <td data-label="Status"><span class="badge badge-success">Online</span></td>
+                  <td data-label="Battery">92%</td>
+                  <td data-label="Connection">45 ms</td>
+                  <td data-label="Actions">
+                    <button class="btn-sm btn-outline-sm">Edit</button>
+                    <button class="btn-sm btn-danger-sm">Remove</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 2: Add New Device Form -->
+        <div class="data-card animate-fade-up">
+          <h2>Register New Device</h2>
+          <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 1.5rem;">Connect a new hardware sensor or camera module to the local router grid.</p>
+          <form onsubmit="event.preventDefault(); alert('Device pairing requested!');">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Device Name</label>
+                <input type="text" class="form-control" placeholder="e.g. Patio Sensor" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Device Type</label>
+                <select class="form-control">
+                  <option>Camera Feed</option>
+                  <option>Smart Lock</option>
+                  <option>Motion Sensor</option>
+                  <option>Alarm Siren</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">IP Address</label>
+                <input type="text" class="form-control" placeholder="192.168.1.100" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pairing Pin</label>
+                <input type="password" class="form-control" placeholder="••••" required>
+              </div>
+            </div>
+            <button type="submit" class="btn-sm btn-primary-sm" style="padding: 0.75rem 2rem;">Register & Pair Device</button>
+          </form>
+        </div>
+
+        <!-- Section 3: Diagnostic Connection Status -->
+        <div class="data-card animate-fade-up">
+          <h2>Signal Diagnostic Health</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+            <div style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+              <span style="font-size: 0.75rem; color: #a0aec0; display: block; margin-bottom: 0.5rem;">Wi-Fi Signal Grid</span>
+              <strong style="font-size: 1.5rem; color: #4faf6b;">Excellent (98%)</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+              <span style="font-size: 0.75rem; color: #a0aec0; display: block; margin-bottom: 0.5rem;">Zigbee Mesh Network</span>
+              <strong style="font-size: 1.5rem; color: #ff9500;">Fair (74%)</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03);">
+              <span style="font-size: 0.75rem; color: #a0aec0; display: block; margin-bottom: 0.5rem;">Cellular Backup Link</span>
+              <strong style="font-size: 1.5rem; color: #4faf6b;">Standby (Connected)</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Firmware Updates -->
+        <div class="data-card animate-fade-up">
+          <div class="card-header-flex">
+            <h2>Firmware Distribution</h2>
+            <button class="btn-sm btn-outline-sm" onclick="alert('Checking for server updates...')">Refresh List</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 1rem; border-radius: 8px;">
+              <span>Front Gate CCTV (v2.4.1)</span>
+              <button class="btn-sm btn-primary-sm" style="background: #ff9500;" onclick="alert('Update started')">Update to v2.5.0</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.01); padding: 1rem; border-radius: 8px;">
+              <span>Kitchen Smoke Detector (v1.0.9)</span>
+              <span style="font-size: 0.85rem; color: #a0aec0;">Up to date</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Bandwidth Usage Tracker -->
+        <div class="data-card animate-fade-up">
+          <h2>Network Bandwidth Allocation</h2>
+          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                <span>CCTV streams (HD Video)</span>
+                <span>12.4 Mbps</span>
+              </div>
+              <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                <div style="width: 75%; height: 100%; background: #007aff; border-radius: 3px;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                <span>Sensors polling (Telemetry)</span>
+                <span>0.8 Mbps</span>
+              </div>
+              <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                <div style="width: 10%; height: 100%; background: #007aff; border-radius: 3px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 2. USER MANAGEMENT -->
+      <div class="tab-pane" id="user-mgmt">
+        <div class="tab-header animate-fade-up">
+          <h1>User Management</h1>
+          <p>Control client credentials, access privileges, and system roles.</p>
+        </div>
+
+        <!-- Section 1: User Registry -->
+        <div class="data-card animate-fade-up">
+          <h2>User Registry</h2>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>User Profile</th>
+                  <th>Role</th>
+                  <th>Permission Level</th>
+                  <th>Status</th>
+                  <th>Registered</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="User Profile">John Doe (john@stackly.com)</td>
+                  <td data-label="Role">Client</td>
+                  <td data-label="Permission Level">Regular Account</td>
+                  <td data-label="Status"><span class="badge badge-success">Active</span></td>
+                  <td data-label="Registered">2026-02-14</td>
+                  <td data-label="Actions">
+                    <button class="btn-sm btn-outline-sm">Modify</button>
+                    <button class="btn-sm btn-danger-sm">Suspend</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-label="User Profile">Dev Tech (dev@stackly.com)</td>
+                  <td data-label="Role">Admin</td>
+                  <td data-label="Permission Level">Root Admin</td>
+                  <td data-label="Status"><span class="badge badge-success">Active</span></td>
+                  <td data-label="Registered">2026-01-01</td>
+                  <td data-label="Actions">
+                    <button class="btn-sm btn-outline-sm">Modify</button>
+                    <button class="btn-sm btn-danger-sm">Suspend</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 2: Add New User Form -->
+        <div class="data-card animate-fade-up">
+          <h2>Create User Profile</h2>
+          <form onsubmit="event.preventDefault(); alert('User account registered!');">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" placeholder="e.g. Sarah Connor" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" placeholder="sarah@skynet.com" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Assigned Role</label>
+                <select class="form-control">
+                  <option>Client</option>
+                  <option>Admin</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Keypad PIN</label>
+                <input type="password" class="form-control" placeholder="e.g. 1234" required>
+              </div>
+            </div>
+            <button type="submit" class="btn-sm btn-primary-sm" style="padding: 0.75rem 2rem;">Register Account</button>
+          </form>
+        </div>
+
+        <!-- Section 3: Active Sessions & Audit Logs -->
+        <div class="data-card animate-fade-up">
+          <h2>Security Audit Feed</h2>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.85rem; max-height: 250px; overflow-y: auto;">
+            <div style="border-left: 2px solid #007aff; padding-left: 1rem; margin-bottom: 0.5rem;">
+              <strong style="color: #007aff;">[10:14 AM]</strong> Admin altered Front Gate CCTV zoom rules.
+            </div>
+            <div style="border-left: 2px solid #4faf6b; padding-left: 1rem; margin-bottom: 0.5rem;">
+              <strong style="color: #4faf6b;">[09:30 AM]</strong> Client john@stackly.com logged in via iPhone.
+            </div>
+            <div style="border-left: 2px solid #ff9500; padding-left: 1rem; margin-bottom: 0.5rem;">
+              <strong style="color: #ff9500;">[08:12 AM]</strong> Keypad code failure detected at front gate entrance.
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Role Permissions Matrix -->
+        <div class="data-card animate-fade-up">
+          <h2>Access Permissions Matrix</h2>
+          <div style="overflow-x: auto; margin-top: 1rem;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Feature Scope</th>
+                  <th>Admin</th>
+                  <th>Client</th>
+                  <th>Technician</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Feature Scope">View Live Feeds</td>
+                  <td data-label="Admin"><i class="fas fa-check" style="color: #4faf6b;"></i></td>
+                  <td data-label="Client"><i class="fas fa-check" style="color: #4faf6b;"></i></td>
+                  <td data-label="Technician"><i class="fas fa-check" style="color: #4faf6b;"></i></td>
+                </tr>
+                <tr>
+                  <td data-label="Feature Scope">Add/Remove Hardware</td>
+                  <td data-label="Admin"><i class="fas fa-check" style="color: #4faf6b;"></i></td>
+                  <td data-label="Client"><i class="fas fa-times" style="color: #ff3b30;"></i></td>
+                  <td data-label="Technician"><i class="fas fa-check" style="color: #4faf6b;"></i></td>
+                </tr>
+                <tr>
+                  <td data-label="Feature Scope">System Database Reset</td>
+                  <td data-label="Admin"><i class="fas fa-check" style="color: #4faf6b;"></i></td>
+                  <td data-label="Client"><i class="fas fa-times" style="color: #ff3b30;"></i></td>
+                  <td data-label="Technician"><i class="fas fa-times" style="color: #ff3b30;"></i></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 5: Security Policy Enforcer -->
+        <div class="data-card animate-fade-up">
+          <h2>Grid Security Policy</h2>
+          <div style="display: flex; flex-direction: column; gap: 1.25rem; margin-top: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong style="display: block; font-size: 0.95rem;">Enforce Double-Factor Authentication (MFA)</strong>
+                <span style="font-size: 0.8rem; color: #a0aec0;">Force users to verify logins via mobile SMS links.</span>
+              </div>
+              <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #007aff;">
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong style="display: block; font-size: 0.95rem;">Password Expiry Threshold</strong>
+                <span style="font-size: 0.8rem; color: #a0aec0;">Force password changes every 90 days.</span>
+              </div>
+              <input type="checkbox" style="width: 18px; height: 18px; accent-color: #007aff;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. SECURITY ALERTS -->
+      <div class="tab-pane" id="security-alerts">
+        <div class="tab-header animate-fade-up">
+          <h1>Security Alerts</h1>
+          <p>Real-time warning center logs. Take immediate actions on emergency reports.</p>
+        </div>
+
+        <!-- Section 1: Critical Action Feed -->
+        <div class="data-card animate-fade-up" style="border-left: 4px solid #ff3b30;">
+          <div class="card-header-flex">
+            <h2>Critical Action Feed</h2>
+            <span class="badge badge-danger">2 UNRESOLVED EVENTS</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="background: rgba(255, 59, 48, 0.03); border: 1px solid rgba(255, 59, 48, 0.1); padding: 1.25rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <strong style="color: #ff3b30; font-size: 0.95rem;"><i class="fas fa-exclamation-triangle"></i> Intrusion Alert</strong>
+                <p style="margin: 0.5rem 0 0; font-size: 0.85rem; color: #a0aec0;">Sensor trigger detected on patio double glazing window. Camera 3 recorded movement.</p>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button class="btn-sm btn-primary-sm" onclick="alert('Emergency dispatch activated!')">Dispatch Police</button>
+                <button class="btn-sm btn-outline-sm" onclick="this.parentElement.parentElement.style.display='none'">Dismiss</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Active Incident Property Map -->
+        <div class="data-card animate-fade-up">
+          <h2>Property Protection Map Grid</h2>
+          <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 1.5rem;">Visual beacon zones indicating real-time status of connected building divisions.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem;">
+            <div style="background: rgba(79, 175, 107, 0.05); border: 1px solid rgba(79, 175, 107, 0.2); padding: 1rem; border-radius: 10px; text-align: center; position: relative;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: #4faf6b; position: absolute; top: 0.5rem; right: 0.5rem;"></div>
+              <span style="font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">Front Gate</span>
+              <span style="font-size: 0.75rem; color: #4faf6b;">Secure</span>
+            </div>
+            <div style="background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.2); padding: 1rem; border-radius: 10px; text-align: center; position: relative;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: #ff3b30; position: absolute; top: 0.5rem; right: 0.5rem; animation: pulse 1.2s infinite;"></div>
+              <span style="font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">Back Patio</span>
+              <span style="font-size: 0.75rem; color: #ff3b30;">Breach!</span>
+            </div>
+            <div style="background: rgba(79, 175, 107, 0.05); border: 1px solid rgba(79, 175, 107, 0.2); padding: 1rem; border-radius: 10px; text-align: center; position: relative;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: #4faf6b; position: absolute; top: 0.5rem; right: 0.5rem;"></div>
+              <span style="font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 0.25rem;">Kitchen</span>
+              <span style="font-size: 0.75rem; color: #4faf6b;">Secure</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Historical Incident Log -->
+        <div class="data-card animate-fade-up">
+          <h2>Incident Log History</h2>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Event ID</th>
+                  <th>Date/Time</th>
+                  <th>Location</th>
+                  <th>Incident Type</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Event ID">#2491</td>
+                  <td data-label="Date/Time">2026-07-12 14:02</td>
+                  <td data-label="Location">Front Porch</td>
+                  <td data-label="Incident Type">Unrecognized Face</td>
+                  <td data-label="Status"><span class="badge badge-success">Resolved</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Event ID">#2490</td>
+                  <td data-label="Date/Time">2026-07-11 23:45</td>
+                  <td data-label="Location">Garage Side</td>
+                  <td data-label="Incident Type">Motion Alert</td>
+                  <td data-label="Status"><span class="badge badge-success">False Alarm</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 4: Emergency Contacts Dispatch -->
+        <div class="data-card animate-fade-up">
+          <h2>Emergency Call Dispatch</h2>
+          <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 1.5rem;">Speed dials configured to forward alert clips directly to public security stations.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <button class="btn-sm btn-danger-sm" style="padding: 1.25rem; font-size: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.75rem;" onclick="alert('Police dispatched!')">
+              <i class="fas fa-shield-alt"></i> Call Police (100)
+            </button>
+            <button class="btn-sm btn-danger-sm" style="padding: 1.25rem; font-size: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.75rem;" onclick="alert('Fire brigade dispatched!')">
+              <i class="fas fa-fire-extinguisher"></i> Call Fire Dept (101)
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 5: Alert Dispatch Protocol Settings -->
+        <div class="data-card animate-fade-up">
+          <h2>Dispatch Delay Threshold</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+            <div>
+              <label class="form-label" style="display: block; margin-bottom: 0.5rem;">Authority Notification Hold (Seconds)</label>
+              <input type="range" min="10" max="120" value="30" class="form-control" style="padding: 0; width: 100%; accent-color: #007aff;" oninput="this.nextElementSibling.innerText = this.value + ' Seconds'">
+              <span style="font-size: 0.85rem; color: #a0aec0; display: block; margin-top: 0.25rem;">30 Seconds</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 4. CAMERA MONITORING -->
+      <div class="tab-pane" id="camera-mon">
+        <div class="tab-header animate-fade-up">
+          <h1>Camera Monitoring</h1>
+          <p>Access live camera feeds, check system records, and verify camera operational status.</p>
+        </div>
+
+        <!-- Section 1: Live Feeds -->
+        <div class="data-card animate-fade-up">
+          <h2>Surveillance Viewports</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+            <div style="background-color: #1c2331; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); position: relative;">
+              <div style="width: 100%; aspect-ratio: 16/9; background: #0f131c; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-video-slash" style="font-size: 1.5rem; color: #2d3748;"></i>
+                <span style="position: absolute; bottom: 0.5rem; left: 0.5rem; background: rgba(0,0,0,0.6); padding: 0.2rem 0.4rem; font-size: 0.7rem; border-radius: 4px;">Gate Camera</span>
+              </div>
+            </div>
+            <div style="background-color: #1c2331; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); position: relative;">
+              <div style="width: 100%; aspect-ratio: 16/9; background: #0f131c; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-video-slash" style="font-size: 1.5rem; color: #2d3748;"></i>
+                <span style="position: absolute; bottom: 0.5rem; left: 0.5rem; background: rgba(0,0,0,0.6); padding: 0.2rem 0.4rem; font-size: 0.7rem; border-radius: 4px;">Driveway Cam</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Camera Settings Adjuster -->
+        <div class="data-card animate-fade-up">
+          <h2>Lens Settings Adjuster</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Select Lens Target</label>
+              <select class="form-control">
+                <option>Front Gate CCTV</option>
+                <option>Driveway Camera</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Streaming Stream Quality</label>
+              <select class="form-control">
+                <option>4K Ultra HD (30 FPS)</option>
+                <option>1080p Full HD (60 FPS)</option>
+                <option>720p Low Latency (15 FPS)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Motion Detection Zones -->
+        <div class="data-card animate-fade-up">
+          <h2>Active Warning Tracking Grid</h2>
+          <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 1.5rem;">Check/uncheck areas below to define active motion tracking blocks on porch lens viewport.</p>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; max-width: 300px; margin: 0 auto;">
+            <div style="background: rgba(0,122,255,0.1); border: 1px solid #007aff; aspect-ratio: 1; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="this.style.background = this.style.background ? '' : 'rgba(0,122,255,0.1)'; this.style.borderColor = this.style.borderColor ? '' : '#007aff';">A1</div>
+            <div style="background: rgba(0,122,255,0.1); border: 1px solid #007aff; aspect-ratio: 1; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="this.style.background = this.style.background ? '' : 'rgba(0,122,255,0.1)'; this.style.borderColor = this.style.borderColor ? '' : '#007aff';">A2</div>
+            <div style="background: rgba(0,122,255,0.1); border: 1px solid #007aff; aspect-ratio: 1; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center;" onclick="this.style.background = this.style.background ? '' : 'rgba(0,122,255,0.1)'; this.style.borderColor = this.style.borderColor ? '' : '#007aff';">A3</div>
+          </div>
+        </div>
+
+        <!-- Section 4: DVR Timeline scrubber -->
+        <div class="data-card animate-fade-up">
+          <h2>Playback DVR Clip Scrubber</h2>
+          <div style="margin-top: 1.5rem; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); padding: 1.25rem; border-radius: 12px;">
+            <div style="height: 10px; width: 100%; background: rgba(255,255,255,0.1); border-radius: 5px; position: relative; margin-bottom: 1rem;">
+              <div style="height: 100%; width: 45%; background: #007aff; border-radius: 5px;"></div>
+              <div style="width: 14px; height: 14px; border-radius: 50%; background: white; position: absolute; left: 45%; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: #a0aec0;">
+              <span>00:00 AM</span>
+              <span>12:00 PM</span>
+              <span>23:59 PM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Cloud Storage Health Gauge -->
+        <div class="data-card animate-fade-up">
+          <h2>Storage Usage Details</h2>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-top: 1rem;">
+            <div>
+              <strong style="font-size: 1.5rem; display: block; margin-bottom: 0.25rem;">1.24 TB / 2.00 TB</strong>
+              <span style="font-size: 0.85rem; color: #a0aec0;">Remaining storage capacity: 38% free.</span>
+            </div>
+            <button class="btn-sm btn-outline-sm" onclick="alert('Initiating file compression...')">Compress Storage</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 5. REPORTS & ANALYTICS -->
+      <div class="tab-pane" id="reports-analytics">
+        <div class="tab-header animate-fade-up">
+          <h1>Reports & Analytics</h1>
+          <p>Visual statistics and operational metrics of smart home hardware networks.</p>
+        </div>
+
+        <!-- Section 1: Weekly Incident Log -->
+        <div class="data-card animate-fade-up">
+          <h2>Weekly Incident Log</h2>
+          <div style="margin-top: 2rem;">
+            <svg viewBox="0 0 500 150" style="width: 100%; height: auto;">
+              <defs>
+                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#007aff" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#007aff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <polyline fill="url(#chartGradient)" stroke="none" points="0,150 50,110 100,130 150,80 200,90 250,50 300,70 350,30 400,60 450,20 500,20 500,150" />
+              <path id="graphLine" fill="none" stroke="#007aff" stroke-width="3" d="M0,150 L50,110 L100,130 L150,80 L200,90 L250,50 L300,70 L350,30 L400,60 L450,20 L500,20" />
+              <circle cx="50" cy="110" r="4" fill="#007aff" />
+              <circle cx="150" cy="80" r="4" fill="#007aff" />
+              <circle cx="250" cy="50" r="4" fill="#007aff" />
+              <circle cx="350" cy="30" r="4" fill="#007aff" />
+              <circle cx="450" cy="20" r="4" fill="#007aff" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Section 2: Export Data Tool -->
+        <div class="data-card animate-fade-up">
+          <h2>Export Logs Panel</h2>
+          <form onsubmit="event.preventDefault(); alert('Report generation started!');">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" value="2026-07-01">
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" value="2026-07-13">
+              </div>
+              <div class="form-group">
+                <label class="form-label">File Type</label>
+                <select class="form-control">
+                  <option>Portable Document (PDF)</option>
+                  <option>Comma Separated Values (CSV)</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn-sm btn-primary-sm">Generate Export Document</button>
+          </form>
+        </div>
+
+        <!-- Section 3: Alarm Category Distribution -->
+        <div class="data-card animate-fade-up">
+          <h2>Alarm Trigger Distribution</h2>
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                <span>Door Window Sensors Trigger</span>
+                <span>65%</span>
+              </div>
+              <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                <div style="width: 65%; height: 100%; background: #4faf6b; border-radius: 3px;"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+                <span>Camera Motion Detection</span>
+                <span>25%</span>
+              </div>
+              <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px;">
+                <div style="width: 25%; height: 100%; background: #007aff; border-radius: 3px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Peak Alert Hours Heatmap -->
+        <div class="data-card animate-fade-up">
+          <h2>Peak Alarm Hours</h2>
+          <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 1.5rem;">Time slots showing highest security alert breach logs.</p>
+          <div style="display: flex; justify-content: space-between; gap: 0.5rem; text-align: center;">
+            <div style="flex: 1; padding: 0.5rem; background: rgba(255,59,48,0.1); border-radius: 6px;">
+              <span style="font-size: 0.75rem; display: block; color: #a0aec0;">12AM-6AM</span>
+              <strong style="font-size: 1.1rem; color: #ff3b30;">High</strong>
+            </div>
+            <div style="flex: 1; padding: 0.5rem; background: rgba(79,175,107,0.1); border-radius: 6px;">
+              <span style="font-size: 0.75rem; display: block; color: #a0aec0;">6AM-12PM</span>
+              <strong style="font-size: 1.1rem; color: #4faf6b;">Low</strong>
+            </div>
+            <div style="flex: 1; padding: 0.5rem; background: rgba(255,149,0,0.1); border-radius: 6px;">
+              <span style="font-size: 0.75rem; display: block; color: #a0aec0;">12PM-6PM</span>
+              <strong style="font-size: 1.1rem; color: #ff9500;">Med</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Device Failure Rates -->
+        <div class="data-card animate-fade-up">
+          <h2>Model Defect Tracking</h2>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Hardware SKU</th>
+                  <th>Deployed Nodes</th>
+                  <th>Failed Detections</th>
+                  <th>Warranty Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Hardware SKU">CCTV-Pro-V1</td>
+                  <td data-label="Deployed Nodes">45</td>
+                  <td data-label="Failed Detections">0.2%</td>
+                  <td data-label="Warranty Status"><span class="badge badge-success">Secure</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 6. SYSTEM SETTINGS -->
+      <div class="tab-pane" id="system-settings">
+        <div class="tab-header animate-fade-up">
+          <h1>System Settings</h1>
+          <p>Adjust root settings, notifications thresholds, backup periods, and networks credentials.</p>
+        </div>
+
+        <!-- Section 1: Network & Backup Options -->
+        <div class="data-card animate-fade-up">
+          <h2>Network & Backup Options</h2>
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong style="display: block; margin-bottom: 0.25rem;">Daily Cloud Backups</strong>
+                <span style="font-size: 0.85rem; color: #a0aec0;">Sync system configs and alert footage hourly.</span>
+              </div>
+              <input type="checkbox" checked style="width: 20px; height: 20px; accent-color: #007aff;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: API Keys & Integrations -->
+        <div class="data-card animate-fade-up">
+          <h2>Voice Hub Integrations</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Google Assistant API Client ID</label>
+              <input type="text" class="form-control" value="client_id_google_90291">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amazon Alexa Client Secret</label>
+              <input type="password" class="form-control" value="alexa_secret_key_88">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: SMTP Server Configuration -->
+        <div class="data-card animate-fade-up">
+          <h2>Notification Email Server (SMTP)</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">SMTP Address</label>
+              <input type="text" class="form-control" value="smtp.stackly.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Port</label>
+              <input type="text" class="form-control" value="587">
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Database Maintenance -->
+        <div class="data-card animate-fade-up">
+          <h2>Database Maintenances</h2>
+          <p style="color: #a0aec0; font-size: 0.85rem; margin-bottom: 1.5rem;">Wipe alert log tables or perform hard factory resets.</p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-sm btn-outline-sm" onclick="alert('Cache data tables cleared!')">Clear Cache Tables</button>
+            <button class="btn-sm btn-danger-sm" onclick="confirm('Perform factory reset? All devices will pair again.')">Factory System Reset</button>
+          </div>
+        </div>
+
+        <!-- Section 5: System Diagnostics Logger -->
+        <div class="data-card animate-fade-up">
+          <h2>Core System Telemetry</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+            <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
+              <span style="font-size: 0.75rem; color: #a0aec0; display: block; margin-bottom: 0.25rem;">Server Uptime</span>
+              <strong>14 days, 4h</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
+              <span style="font-size: 0.75rem; color: #a0aec0; display: block; margin-bottom: 0.25rem;">CPU Temperature</span>
+              <strong>42°C</strong>
+            </div>
+            <div style="background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); padding: 1rem; border-radius: 8px;">
+              <span style="font-size: 0.75rem; color: #a0aec0; display: block; margin-bottom: 0.25rem;">Memory Allocation</span>
+              <strong>18% (1.4 GB)</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuItems = document.querySelectorAll('.menu-item');
+      const tabPanes = document.querySelectorAll('.tab-pane');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+      const openSidebarBtn = document.getElementById('openSidebar');
+      const closeSidebarBtn = document.getElementById('closeSidebar');
+
+      // Initialize GSAP ScrollTrigger
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Define simple responsive triggers for data cards
+        gsap.utils.toArray('.animate-fade-up').forEach(card => {
+          gsap.fromTo(card, 
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 95%",
+                toggleActions: "play none none none"
+              }
+            }
+          );
+        });
+      }
+
+      // Tab Switching with GSAP animations
+      menuItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const tabId = item.getAttribute('data-tab');
+
+          menuItems.forEach(i => i.classList.remove('active'));
+          tabPanes.forEach(pane => pane.classList.remove('active'));
+
+          item.classList.add('active');
+          const targetPane = document.getElementById(tabId);
+          targetPane.classList.add('active');
+
+          // GSAP fade & slide up transition on active panel first elements
+          gsap.fromTo(targetPane.querySelectorAll('.tab-header, .data-card'), 
+            { opacity: 0, y: 20 },
+            { 
+              opacity: 1, 
+              y: 0, 
+              duration: 0.5, 
+              stagger: 0.08, 
+              ease: "power2.out",
+              onComplete: () => {
+                // Refresh ScrollTriggers for layout calculations
+                if (typeof ScrollTrigger !== 'undefined') {
+                  ScrollTrigger.refresh();
+                }
+              }
+            }
+          );
+
+          if (window.innerWidth <= 1024) {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('open');
+          }
+        });
+      });
+
+      // Mobile Sidebar Actions
+      openSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.add('open');
+        sidebarOverlay.classList.add('open');
+      });
+
+      closeSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+      });
+
+      sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('open');
+      });
+
+      // SVG path line animation on load
+      const path = document.getElementById('graphLine');
+      if (path) {
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = length;
+        path.style.strokeDashoffset = length;
+        
+        gsap.to(path, {
+          strokeDashoffset: 0,
+          duration: 2,
+          ease: "power2.inOut",
+          delay: 0.5
+        });
+      }
+
+      // Retrieve current login user name
+      const storedEmail = localStorage.getItem('currentUserEmail') || 'Admin Control';
+      const cleanUsername = storedEmail.split('@')[0];
+      const nameDisplay = document.getElementById('userNameDisplay');
+      const avatarDisplay = document.getElementById('userAvatarDisplay');
+      if (nameDisplay && avatarDisplay) {
+        nameDisplay.innerText = cleanUsername;
+        avatarDisplay.innerText = cleanUsername.charAt(0).toUpperCase();
+      }
+    });
+  </script>
+</body>
+</html>
