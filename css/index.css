@@ -201,6 +201,7 @@ header.nav-scrolled .logo img {
 .nav-links {
   display: flex;
   gap: 3rem;
+  font-family: 'Poppins', sans-serif;
 }
 
 .nav-links li a {
@@ -300,6 +301,7 @@ header.nav-scrolled .logo img {
   background-color: var(--color-white);
   color: var(--color-black);
   padding: 0.6rem 1.5rem;
+  font-family: 'Poppins', sans-serif;
   border-radius: var(--border-radius-pill);
   font-weight: 600;
   font-size: 0.9rem;
@@ -700,6 +702,11 @@ header.nav-open .mobile-menu-toggle .bar:nth-child(3) {
     display: block;
     margin-top: 1rem;
     text-align: center;
+  }
+  
+  .nav-links li.mobile-login a.btn-login {
+    padding: 0.8rem 3rem !important;
+    display: inline-block;
   }
   
   header.nav-open .nav-links {

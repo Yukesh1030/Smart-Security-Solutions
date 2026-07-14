@@ -111,6 +111,22 @@
     .form-control:focus {
       outline: none;
       border-color: #007aff;
+      background: rgba(255, 255, 255, 0.05);
+      color: #f7fafc;
+    }
+
+    .form-control:-webkit-autofill,
+    .form-control:-webkit-autofill:hover, 
+    .form-control:-webkit-autofill:focus, 
+    .form-control:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #121824 inset !important;
+      -webkit-text-fill-color: #f7fafc !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    .form-control option {
+      background-color: #121824;
+      color: #f7fafc;
     }
 
     .password-wrapper {
